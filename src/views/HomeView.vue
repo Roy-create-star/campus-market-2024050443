@@ -1,6 +1,6 @@
 <script setup lang="ts">
 // 获取当前星期
-const weekList = ['周天','周一','周二','周三','周四','周五','周六']
+const weekList = ['周末','周一','周二','周三','周四','周五','周六']
 const today = weekList[new Date().getDay()]
 </script>
 
