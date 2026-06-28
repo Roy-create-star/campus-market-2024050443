@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<!--
+ * ============================================================
+ * 校园轻集市 - 消息中心 (页面7 - dual column layout)
+ * File: messages.html
+ * Migration note: This is a static HTML prototype using Vue 3 + Element Plus + Tailwind CSS.
+ * Vue data (conversations list, activeConversation) should be replaced with API calls.
+ * el-badge, el-avatar rely on Element Plus CDN.
+ * Layout uses calc(100vh - 64px) to account for fixed navbar.
+ * Color scheme: primary #FFE8D6, secondary #FFF9F3, #E6F4EA.
+ * Tabs navigation placeholders should be replaced with vue-router.
+ * ============================================================
+-->
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>消息中心 - 校园轻集市</title>
+  <!-- CDN Dependencies -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/element-plus/2.6.1/theme-chalk/index.min.css" />
+  <script src="https://cdn.jsdelivr.net/npm/vue@3.4.21/dist/vue.global.prod.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/element-plus/2.6.1/index.full.min.js"></script>
+  <!-- Tailwind via CDN -->
+  <script src="https://cdn.tailwindcss.com/3.4.1"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background: #FFF9F3; color: #333; }
+    /* Navbar placeholder styles */
+    .navbar { height: 64px; background: #fff; border-bottom: 1px solid #eee; display: flex; align-items: center; padding: 0 40px; position: fixed; top: 0; left: 0; right: 0; z-index: 1000; }
+    .navbar .logo { font-size: 20px; font-weight: 700; color: #333; }
+    .navbar .logo span { color: #FFE8D6; }
+    .navbar .nav-tabs { margin-left: 48px; display: flex; gap: 32px; }
+    .navbar .nav-tabs a { text-decoration: none; color: #666; font-size: 15px; }
+    .navbar .nav-tabs a.active { color: #333; font-weight: 600; position: relative; }
+    .navbar .nav-tabs a.active::after { content: ''; position: absolute; bottom: -20px; left: 0; right: 0; height: 3px; background: #FFE8D6; border-radius: 2px; }
+    /* Layout */
+    .app-container { margin-top: 64px; height: calc(100vh - 64px); display: flex; background: #fff; }
+    .left-panel { width: 380px; min-width: 380px; border-right: 1px solid #f0f0f0; display: flex; flex-direction: column; background: #fff; }
+    .right-panel { flex: 1; display: flex; align-items: center; justify-content: center; background: #FFF9F3; }
+    /* Left panel header */
+    .panel-header { padding: 20px 24px 16px; border-bottom: 1px solid #f5f5f5; }
+    .panel-header h2 { font-size: 18px; font-weight: 600; color: #333; }
+    .panel-header .subtitle { font-size: 13px; color: #999; margin-top: 4px; }
+    /* Conversation search */
+    .search-box { padding: 12px 24px; }
+    .search-box .el-input__wrapper { background: #f5f5f5; border-radius: 20px; box-shadow: none !important; }
+    /* Conversation list */
+    .conversation-list { flex: 1; overflow-y: auto; }
+    .conversation-list::-webkit-scrollbar { width: 4px; }
+    .conversation-list::-webkit-scrollbar-thumb { background: #e0e0e0; border-radius: 2px; }
+    .conversation-item { display: flex; align-items: center; padding: 16px 24px; cursor: pointer; transition: background 0.2s; border-bottom: 1px solid #f8f8f8; }
+    .conversation-item:hover { background: #fafafa; }
+    .conversation-item.active { background: #FFE8D6; }
+    .conversation-item .avatar-wrap { position: relative; margin-right: 14px; flex-shrink: 0; }
+    .conversation-item .avatar-wrap .el-avatar { border: 2px solid #fff; box-shadow: 0 2px 6px rgba(0,0,0,0.06); }
+    .conversation-item .item-preview { width: 48px; height: 48px; border-radius: 8px; background: #f0f0f0; flex-shrink: 0; margin-right: 14px; overflow: hidden; display: flex; align-items: center; justify-content: center; font-size: 10px; color: #bbb; }
+    .conversation-item .info { flex: 1; min-width: 0; }
+    .conversation-item .info .top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+    .conversation-item .info .top .name { font-size: 15px; font-weight: 500; color: #333; }
+    .conversation-item .info .top .time { font-size: 12px; color: #999; }
+    .conversation-item .info .last-msg { font-size: 13px; color: #999; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .conversation-item .info .last-msg .price-highlight { color: #E74C3C; font-weight: 500; }
+    /* Empty state */
+    .empty-state { text-align: center; color: #bbb; }
+    .empty-state .el-icon { font-size: 64px; margin-bottom: 16px; }
+    .empty-state h3 { font-size: 16px; font-weight: 500; color: #999; margin-bottom: 8px; }
+    .empty-state p { font-size: 13px; color: #bbb; }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <!-- Navbar placeholder -->
+    <nav class="navbar">
+      <div class="logo"><span>校园</span>轻集市</div>
+      <div class="nav-tabs">
+        <a href="#">首页</a>
+        <a href="#">集市</a>
+        <a href="#" class="active">消息</a>
+        <a href="#">我的</a>
+      </div>
+    </nav>
+
+    <!-- Main app container -->
+    <div class="app-container">
+      <!-- Left: Conversation list -->
+      <div class="left-panel">
+        <div class="panel-header">
+          <h2>消息中心</h2>
+          <div class="subtitle">共 {{ conversations.length }} 个会话</div>
+        </div>
+        <div class="search-box">
+          <el-input v-model="searchQuery" placeholder="搜索消息或用户" :prefix-icon="Search" clearable size="default" />
+        </div>
+        <div class="conversation-list">
+          <div
+            v-for="conv in filteredConversations"
+            :key="conv.id"
+            class="conversation-item"
+            :class="{ active: activeConversation && activeConversation.id === conv.id }"
+            @click="activeConversation = conv"
+          >
+            <div class="avatar-wrap">
+              <el-avatar :size="48" :src="conv.avatar">{{ conv.name.charAt(0) }}</el-avatar>
+            </div>
+            <div class="item-preview">
+              {{ conv.itemName }}
+            </div>
+            <div class="info">
+              <div class="top">
+                <span class="name">{{ conv.name }}</span>
+                <span class="time">{{ conv.lastTime }}</span>
+              </div>
+              <div class="last-msg">
+                <span v-if="conv.lastMsgType === 'price'" class="price-highlight">{{ conv.lastMsg }}</span>
+                <span v-else>{{ conv.lastMsg }}</span>
+              </div>
+            </div>
+            <div style="margin-left:8px;" v-if="conv.unread > 0">
+              <el-badge :value="conv.unread" :max="99" />
+            </div>
+          </div>
+          <div v-if="filteredConversations.length === 0" style="text-align:center;padding:48px 24px;color:#bbb;">
+            <p>暂无会话</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: Empty state -->
+      <div class="right-panel" v-if="!activeConversation">
+        <div class="empty-state">
+          <el-icon :size="64"><ChatDotRound /></el-icon>
+          <h3>请选择一个会话</h3>
+          <p>从左侧列表选择消息开始聊天</p>
+        </div>
+      </div>
+
+      <!-- Right: Conversation detail -->
+      <div class="right-panel" v-else style="flex-direction:column;align-items:stretch;justify-content:flex-start;background:#fff;">
+        <!-- Placeholder for chat detail -->
+        <div style="display:flex;align-items:center;justify-content:center;height:100%;flex-direction:column;color:#bbb;">
+          <el-icon :size="48"><Message /></el-icon>
+          <p style="margin-top:12px;">已选择与 {{ activeConversation.name }} 的会话</p>
+          <p style="font-size:13px;margin-top:4px;">请在 chat.html 中查看聊天详情</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const { createApp, ref, computed } = Vue;
+    // Migration note: Replace mock data with API fetch from /api/messages/conversations
+    const mockConversations = [
+      { id: 1, name: '小李同学', avatar: '', itemName: '微积分教材', itemThumb: '', lastMsg: '好的，那就45元成交吧', lastMsgType: 'price', lastTime: '14:32', unread: 2 },
+      { id: 2, name: '张学姐', avatar: '', itemName: '台灯', itemThumb: '', lastMsg: '没问题，明天下午3点图书馆见', lastMsgType: 'text', lastTime: '昨天', unread: 0 },
+      { id: 3, name: '王学长', avatar: '', itemName: '机械键盘', itemThumb: '', lastMsg: '还能便宜一点吗？', lastMsgType: 'text', lastTime: '昨天', unread: 1 },
+      { id: 4, name: '大二-陈', avatar: '', itemName: '英语四级真题', itemThumb: '', lastMsg: '好的，我已经付款了', lastMsgType: 'text', lastTime: '周三', unread: 0 },
+      { id: 5, name: '赵同学', avatar: '', itemName: '瑜伽垫', itemThumb: '', lastMsg: '还在吗？', lastMsgType: 'text', lastTime: '周一', unread: 3 },
+      { id: 6, name: '刘学姐', avatar: '', itemName: '画板套装', itemThumb: '', lastMsg: '30元可以吗？', lastMsgType: 'price', lastTime: '2025-06-20', unread: 0 },
+    ];
+
+    const app = createApp({
+      setup() {
+        const searchQuery = ref('');
+        const conversations = ref(mockConversations);
+        const activeConversation = ref(null);
+
+        const filteredConversations = computed(() => {
+          if (!searchQuery.value.trim()) return conversations.value;
+          const q = searchQuery.value.trim().toLowerCase();
+          return conversations.value.filter(c =>
+            c.name.toLowerCase().includes(q) ||
+            c.itemName.toLowerCase().includes(q) ||
+            c.lastMsg.toLowerCase().includes(q)
+          );
+        });
+
+        return {
+          searchQuery,
+          conversations,
+          activeConversation,
+          filteredConversations,
+          // Element Plus icons
+          Search: ElementPlusIconsVue.Search,
+          ChatDotRound: ElementPlusIconsVue.ChatDotRound,
+          Message: ElementPlusIconsVue.Message,
+        };
+      }
+    });
+
+    app.use(ElementPlus);
+    app.mount('#app');
+  </script>
+</body>
+</html>

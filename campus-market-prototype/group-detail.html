@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<!-- ============================================================
+     页面4: 拼单搭子详情页 (Group-buy Detail Page)
+     Element Plus + Vue 3 + Tailwind CSS (CDN)
+     Main: #FFE8D6  Secondary: #FFF9F3  Text: #333 / #666
+     1920 layout, max-width: 1440px
+     Migration: 页面5 drawer 版本见底部注释块
+     ============================================================ -->
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>拼单详情 - 校园轻集市</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/element-plus/dist/index.css" />
+  <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/element-plus"></script>
+  <style>
+    :root { --main: #FFE8D6; --secondary: #FFF9F3; --text-primary: #333; --text-secondary: #666; }
+    body { background: var(--secondary); color: var(--text-primary); font-family: 'PingFang SC','Microsoft YaHei',sans-serif; }
+    .page-wrapper { max-width: 1440px; margin: 0 auto; padding: 24px 40px; width: 100%; }
+    .main-bg { background: var(--main); }
+    .el-carousel__item h3 { display: flex; align-items: center; justify-content: center; height: 100%; margin: 0; }
+    .fixed-bar { position: fixed; bottom: 0; left: 0; right: 0; background: #fff; border-top: 1px solid #eee; padding: 12px 40px; z-index: 1000; }
+    .participant-avatar { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+    .progress-bar { height: 10px; border-radius: 5px; background: #f0e0d0; overflow: hidden; }
+    .progress-fill { height: 100%; border-radius: 5px; background: #FFE8D6; transition: width 0.3s; }
+    @media (max-width: 768px) { .page-wrapper { padding: 12px 16px; } .fixed-bar { padding: 10px 16px; } }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <div class="page-wrapper" style="padding-bottom: 80px;">
+      <el-breadcrumb separator="/" class="mb-4 text-sm">
+        <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
+        <el-breadcrumb-item :to="{ path: '/category/group' }">拼单搭子</el-breadcrumb-item>
+        <el-breadcrumb-item>详情</el-breadcrumb-item>
+      </el-breadcrumb>
+
+      <div class="flex flex-col lg:flex-row gap-8">
+        <!-- ======== 左侧：图片轮播 ======== -->
+        <div class="w-full lg:w-[580px] shrink-0">
+          <el-carousel :interval="4000" type="card" height="420px" indicator-position="outside">
+            <el-carousel-item v-for="(img, idx) in images" :key="idx">
+              <div class="flex items-center justify-center h-full rounded-xl text-8xl main-bg">{{ img }}</div>
+            </el-carousel-item>
+          </el-carousel>
+          <div class="flex gap-2 mt-3">
+            <div v-for="(img, idx) in images" :key="idx"
+                 class="w-16 h-16 rounded-lg main-bg flex items-center justify-center text-2xl cursor-pointer hover:opacity-80">
+              {{ img }}
+            </div>
+          </div>
+        </div>
+
+        <!-- ======== 右侧：信息区 ======== -->
+        <div class="flex-1 min-w-0">
+          <!-- 标题 -->
+          <div class="flex items-start gap-3 mb-3">
+            <h1 class="text-2xl font-bold text-[#333] leading-tight">奶茶第二杯半价 · 一点点拼单</h1>
+            <el-tag color="#FFE8D6" style="color:#333;border:1px solid #e8c8a0;">拼单中</el-tag>
+          </div>
+
+          <!-- 发布者 -->
+          <div class="flex items-center gap-3 mb-4 p-3 rounded-lg" style="background:var(--secondary);">
+            <div class="w-10 h-10 rounded-full main-bg flex items-center justify-center text-xl">🧋</div>
+            <div>
+              <p class="font-medium text-sm">王五 · 拼单发起者</p>
+              <p class="text-xs text-[#666] mt-0.5">已成功发起 8 次拼单</p>
+            </div>
+          </div>
+
+          <!-- 拼单核心信息 -->
+          <div class="grid grid-cols-3 gap-4 mb-4">
+            <div class="p-3 rounded-lg text-center" style="background:var(--secondary);">
+              <p class="text-xs text-[#999] mb-1">目标人数</p>
+              <p class="text-xl font-bold text-[#333]">{{ targetCount }} 人</p>
+            </div>
+            <div class="p-3 rounded-lg text-center" style="background:var(--secondary);">
+              <p class="text-xs text-[#999] mb-1">已加入</p>
+              <p class="text-xl font-bold" style="color:#e74c3c;">{{ currentCount }} 人</p>
+            </div>
+            <div class="p-3 rounded-lg text-center" style="background:var(--secondary);">
+              <p class="text-xs text-[#999] mb-1">截止时间</p>
+              <p class="text-sm font-bold text-[#333]">{{ deadline }}</p>
+            </div>
+          </div>
+
+          <!-- 进度条 -->
+          <div class="mb-4">
+            <div class="flex justify-between text-xs text-[#666] mb-1">
+              <span>拼单进度</span>
+              <span>{{ progress }}%</span>
+            </div>
+            <div class="progress-bar">
+              <div class="progress-fill" :style="{ width: progress + '%' }"></div>
+            </div>
+          </div>
+
+          <!-- 当前参与者列表 -->
+          <div class="mb-4">
+            <h3 class="font-bold text-sm mb-3">👥 当前参与者（{{ currentCount }} / {{ targetCount }}）</h3>
+            <div class="flex flex-wrap gap-3">
+              <div v-for="(p, idx) in participants" :key="idx"
+                   class="flex items-center gap-2 p-2 rounded-lg" style="background:var(--secondary);">
+                <div class="participant-avatar main-bg">{{ p.emoji }}</div>
+                <div>
+                  <p class="text-sm font-medium">{{ p.name }}</p>
+                  <p class="text-xs text-[#999]">{{ p.item }}</p>
+                </div>
+              </div>
+              <!-- 空缺位 -->
+              <div v-for="n in (targetCount - currentCount)" :key="'empty-'+n"
+                   class="flex items-center gap-2 p-2 rounded-lg border border-dashed" style="border-color:#ddd;background:#fafafa;">
+                <div class="participant-avatar" style="background:#f0f0f0;color:#ccc;">?</div>
+                <div>
+                  <p class="text-sm text-[#999]">等待加入</p>
+                  <p class="text-xs text-[#ccc]">空缺</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 拼单说明 -->
+          <div class="p-4 rounded-xl mb-4" style="background:var(--secondary);border:1px solid #f0e0d0;">
+            <h4 class="font-bold text-sm mb-2">📋 拼单说明</h4>
+            <p class="text-sm text-[#666] leading-relaxed">
+              一点点奶茶第二杯半价活动！拼单成功后在思明校区自取。抹茶/波霸/四季春均可，统一点单。
+              费用AA，预计人均 ¥8-12。有想喝的快来！
+            </p>
+            <div class="flex flex-wrap gap-2 mt-3">
+              <el-tag v-for="t in groupTags" :key="t" color="#FFE8D6" style="color:#333;border:none;">{{ t }}</el-tag>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ======== 底部固定栏 ======== -->
+    <div class="fixed-bar flex items-center justify-between">
+      <div class="text-sm text-[#666]">
+        每人约 <span class="font-bold" style="color:#e74c3c;">¥{{ avgCost }}</span>（AA制）
+      </div>
+      <div class="flex items-center gap-3">
+        <el-button v-if="!isJoined" style="background:#FFE8D6;color:#333;border:none;" @click="joinGroup">
+          🚀 加入拼单
+        </el-button>
+        <el-button v-else type="success" disabled>✅ 已加入</el-button>
+        <el-button text style="color:#666;" @click="contactHost">💬 联系发起者</el-button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const { createApp, ref, computed } = Vue;
+    createApp({
+      setup() {
+        const images = ref(['🧋', '🥤', '🧃', '🍵']);
+        const targetCount = ref(4);
+        const currentCount = ref(2);
+        const deadline = ref('06-30 18:00');
+        const isJoined = ref(false);
+        const avgCost = ref(10);
+
+        const progress = computed(() => Math.round((currentCount.value / targetCount.value) * 100));
+
+        const participants = ref([
+          { emoji: '🧋', name: '王五', item: '四季春玛奇朵' },
+          { emoji: '👧', name: '小美', item: '波霸奶茶' },
+        ]);
+        const groupTags = ref(['一点点', '奶茶', '第二杯半价', '思明校区', 'AA制']);
+
+        function joinGroup() {
+          isJoined.value = true;
+          currentCount.value++;
+          participants.value.push({ emoji: '🙋', name: '我', item: '待定' });
+          ElementPlus.ElMessage.success('成功加入拼单！');
+        }
+        function contactHost() {
+          ElementPlus.ElMessage.info('模拟：联系发起者王五');
+        }
+
+        return { images, targetCount, currentCount, deadline, isJoined, avgCost, progress, participants, groupTags, joinGroup, contactHost };
+      }
+    }).use(ElementPlus).mount('#app');
+  </script>
+
+  <!-- ============================================================
+       页面5: el-drawer 版本 (Drawer Version)
+       <el-drawer v-model="drawerVisible" title="拼单详情" size="720px" direction="rtl">
+         <!-- 内容同页面4结构，底部操作栏改为 sticky -->
+       </el-drawer>
+       ============================================================ -->
+</body>
+</html>

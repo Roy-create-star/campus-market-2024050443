@@ -1,0 +1,219 @@
+/* ======================================================
+   校园轻集市 - 全局公共样式文件
+   设计规范：主色 #FFE8D6 | 辅助色 #FFF9F3 / #E6F4EA
+   字体: 思源黑体 (Source Han Sans SC)
+   ====================================================== */
+
+/* --- Element Plus CSS 变量覆盖 --- */
+:root {
+  --el-color-primary: #FFE8D6;
+  --el-color-primary-light-3: #FFF0E3;
+  --el-color-primary-light-5: #FFF5ED;
+  --el-color-primary-light-7: #FFF9F3;
+  --el-color-primary-dark-2: #E8C4A8;
+  --el-color-success: #E6F4EA;
+  --el-color-warning: #FFF3E0;
+  --el-color-danger: #f56c6c;
+  --el-color-error: #f56c6c;
+  --el-color-info: #EEEEEE;
+  --el-text-color-primary: #333333;
+  --el-text-color-regular: #666666;
+  --el-text-color-secondary: #999999;
+  --el-border-radius-base: 12px;
+  --el-border-radius-small: 8px;
+  --el-border-color: #f0f0f0;
+  --el-box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  --el-box-shadow-light: 0 4px 16px rgba(0, 0, 0, 0.08);
+  --el-bg-color: #FFF9F3;
+  --el-bg-color-overlay: #ffffff;
+}
+
+/* --- 全局基础样式 --- */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Source Han Sans SC', 'Noto Sans SC', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  background-color: #FFF9F3;
+  color: #333333;
+  font-size: 14px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* --- 滚动条美化 --- */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #f5f5f5;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb {
+  background: #ddd;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #ccc;
+}
+
+/* --- 通用布局 --- */
+.page-container {
+  max-width: 100%;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.content-wrapper {
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 0 40px;
+  width: 100%;
+}
+
+/* --- 顶部导航栏 --- */
+.top-navbar {
+  background: linear-gradient(135deg, #FFE8D6 0%, #FFDCC0 100%);
+  padding: 0 40px;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.nav-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 20px;
+  font-weight: 700;
+  color: #333;
+  text-decoration: none;
+}
+
+.nav-brand .brand-logo {
+  width: 36px;
+  height: 36px;
+  background: #fff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+}
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.nav-links a {
+  padding: 8px 16px;
+  color: #555;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+  border-radius: 8px;
+  transition: all 0.2s;
+}
+
+.nav-links a:hover,
+.nav-links a.active {
+  background: rgba(255, 255, 255, 0.6);
+  color: #333;
+}
+
+.nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* --- 通用卡片样式 --- */
+.card {
+  background: #ffffff;
+  border-radius: 12px;
+  border: 1px solid #f0f0f0;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+  transition: box-shadow 0.25s ease, transform 0.25s ease;
+}
+
+.card:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  transform: translateY(-2px);
+}
+
+/* --- 淡橘色渐变主按钮 --- */
+.btn-primary {
+  background: linear-gradient(135deg, #FFE8D6, #FFDCC0);
+  border: none;
+  color: #333;
+  padding: 10px 28px;
+  border-radius: 24px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.25s;
+  box-shadow: 0 2px 8px rgba(255, 232, 214, 0.4);
+}
+
+.btn-primary:hover {
+  background: linear-gradient(135deg, #FFDCC0, #FFD0B0);
+  box-shadow: 0 4px 12px rgba(255, 232, 214, 0.6);
+  transform: translateY(-1px);
+}
+
+.btn-primary:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(255, 232, 214, 0.3);
+}
+
+/* --- 淡橘色标签 --- */
+.tag-orange {
+  background: #FFE8D6;
+  color: #8B6F5E;
+  border: none;
+  padding: 2px 10px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+/* --- 页面标题 --- */
+.page-title {
+  font-size: 22px;
+  font-weight: 700;
+  color: #333;
+  margin-bottom: 24px;
+  padding-bottom: 12px;
+  border-bottom: 3px solid #FFE8D6;
+}
+
+/* --- 表单校验提示 --- */
+.el-form-item.is-error .el-input__inner {
+  border-color: #f56c6c;
+}
+.el-form-item__error {
+  color: #f56c6c;
+  font-size: 12px;
+}
+
+/* --- 淡橘装饰线 --- */
+.divider-orange {
+  height: 3px;
+  background: linear-gradient(90deg, #FFE8D6, transparent);
+  border: none;
+  margin: 16px 0;
+}

@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>校园轻集市 - 今日集市首页</title>
+  <!-- MIGRATION: Replace CDN links with local build assets in production -->
+  <link rel="stylesheet" href="https://unpkg.com/element-plus/dist/index.css">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#FFE8D6',
+            'primary-light': '#FFF9F3',
+            'accent-green': '#E6F4EA',
+            'text-primary': '#333333',
+            'text-secondary': '#666666',
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+      background: #f5f5f5;
+      color: #333;
+    }
+    .card-hover {
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      cursor: pointer;
+    }
+    .card-hover:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 12px 28px rgba(0,0,0,0.1);
+    }
+    .gradient-border {
+      background: linear-gradient(#FFF9F3, #FFF9F3) padding-box,
+                  linear-gradient(135deg, #FFE8D6, #E6F4EA) border-box;
+      border: 2px solid transparent;
+      border-radius: 12px;
+    }
+    .hover-grad-border:hover {
+      background: linear-gradient(#FFF9F3, #FFF9F3) padding-box,
+                  linear-gradient(135deg, #FFE8D6, #E6F4EA) border-box;
+      border: 2px solid transparent;
+      border-radius: 12px;
+    }
+    .sticky-sidebar {
+      position: sticky;
+      top: 20px;
+    }
+    .placeholder-img {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+      background: linear-gradient(135deg, #FFF9F3, #FFE8D6);
+      border-radius: 8px;
+    }
+    .placeholder-img-sm {
+      width: 80px;
+      height: 80px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.8rem;
+      background: linear-gradient(135deg, #FFF9F3, #FFE8D6);
+      border-radius: 8px;
+      flex-shrink: 0;
+    }
+    .nav-link {
+      position: relative;
+      padding: 0 16px;
+      font-size: 15px;
+      color: #333;
+      cursor: pointer;
+      transition: color 0.2s;
+    }
+    .nav-link:hover { color: #cc9f7a; }
+    .nav-link.active { color: #cc9f7a; font-weight: 600; }
+    .nav-link.active::after {
+      content: '';
+      position: absolute;
+      bottom: -2px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 20px;
+      height: 3px;
+      background: #cc9f7a;
+      border-radius: 2px;
+    }
+    .security-tip {
+      width: 220px;
+      border-radius: 12px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+    }
+    .hot-item {
+      padding: 10px 0;
+      border-bottom: 1px solid #f0f0f0;
+      cursor: pointer;
+      transition: color 0.2s;
+    }
+    .hot-item:last-child { border-bottom: none; }
+    .hot-item:hover { color: #cc9f7a; }
+    .post-card {
+      padding: 16px;
+      border-bottom: 1px solid #f0f0f0;
+      transition: background 0.2s;
+      cursor: pointer;
+    }
+    .post-card:last-child { border-bottom: none; }
+    .post-card:hover { background: #FFF9F3; }
+    .el-card { border-radius: 12px; border: none; }
+    .user-card .el-card__body { padding: 24px; }
+    .section-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: #333;
+      padding-bottom: 12px;
+      margin-bottom: 16px;
+      border-bottom: 2px solid #FFE8D6;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .section-title .more-link {
+      font-size: 13px;
+      color: #666;
+      font-weight: 400;
+      cursor: pointer;
+    }
+    .section-title .more-link:hover { color: #cc9f7a; }
+    .message-badge .el-badge__content {
+      background-color: #E87373 !important;
+    }
+    .pagination-wrapper {
+      display: flex;
+      justify-content: center;
+      padding: 32px 0;
+    }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <!-- ====== NAVBAR ====== -->
+    <!-- MIGRATION: Replace static nav with router-link components -->
+    <header class="bg-primary shadow-sm sticky top-0 z-40">
+      <div class="max-w-[1440px] mx-auto flex items-center justify-between h-16 px-6">
+        <div class="flex items-center gap-2 cursor-pointer">
+          <span class="text-2xl">🎒</span>
+          <span class="text-xl font-bold" style="color: #333;">校园轻集市</span>
+        </div>
+        <nav class="flex items-center gap-1">
+          <span class="nav-link active">首页</span>
+          <span class="nav-link">集市列表</span>
+          <span class="nav-link">发布</span>
+          <span class="nav-link">消息</span>
+          <span class="nav-link">个人中心</span>
+          <span class="nav-link">数据看板</span>
+        </nav>
+        <div class="flex items-center gap-3">
+          <el-button size="small" round style="background: #FFF9F3; color: #333; border-color: #FFE8D6;">
+            发布信息
+          </el-button>
+        </div>
+      </div>
+    </header>
+
+    <!-- ====== MAIN CONTENT ====== -->
+    <main class="max-w-[1440px] mx-auto px-6 py-6 flex gap-6">
+      <!-- ====== LEFT SIDEBAR: User Info Card ====== -->
+      <!-- MIGRATION: Replace mock user data with real user auth state -->
+      <aside class="w-64 flex-shrink-0">
+        <div class="sticky-sidebar">
+          <el-card shadow="never" class="user-card" style="background: #FFE8D6; border-radius: 12px;">
+            <div class="flex flex-col items-center text-center">
+              <div class="w-20 h-20 rounded-full flex items-center justify-center text-4xl mb-3" style="background: #FFF9F3; box-shadow: 0 2px 8px rgba(0,0,0,0.06);">
+                👤
+              </div>
+              <h3 class="text-lg font-semibold mb-1">{{ userInfo.nickname }}</h3>
+              <p class="text-sm" style="color: #666;">📍 {{ userInfo.campus }}</p>
+              <div class="flex items-center gap-2 mt-3">
+                <el-tag size="small" style="background: #FFF9F3; border-color: #FFF9F3; color: #cc9f7a;">
+                  ⭐ 信用 {{ userInfo.creditScore }} 分
+                </el-tag>
+              </div>
+              <div class="grid grid-cols-3 gap-4 w-full mt-4 pt-4" style="border-top: 1px solid rgba(0,0,0,0.08);">
+                <div>
+                  <p class="text-lg font-bold" style="color: #cc9f7a;">12</p>
+                  <p class="text-xs" style="color: #666;">发布</p>
+                </div>
+                <div>
+                  <p class="text-lg font-bold" style="color: #cc9f7a;">38</p>
+                  <p class="text-xs" style="color: #666;">成交</p>
+                </div>
+                <div>
+                  <p class="text-lg font-bold" style="color: #cc9f7a;">96%</p>
+                  <p class="text-xs" style="color: #666;">好评</p>
+                </div>
+              </div>
+            </div>
+          </el-card>
+        </div>
+      </aside>
+
+      <!-- ====== CENTER CONTENT ====== -->
+      <div class="flex-1 min-w-0">
+        <!-- Quick Entry Cards -->
+        <!-- MIGRATION: Replace with dynamic category links from backend -->
+        <section class="mb-8">
+          <el-row :gutter="20">
+            <el-col :span="6" v-for="(item, index) in quickEntries" :key="index">
+              <el-card shadow="never" class="gradient-border card-hover text-center" :body-style="{ padding: '28px 16px' }">
+                <div class="text-4xl mb-3">{{ item.icon }}</div>
+                <h4 class="text-base font-semibold mb-1">{{ item.title }}</h4>
+                <p class="text-xs" style="color: #666;">{{ item.desc }}</p>
+              </el-card>
+            </el-col>
+          </el-row>
+        </section>
+
+        <!-- Latest Postings + Hot Collections -->
+        <section class="flex gap-6">
+          <!-- Latest Postings -->
+          <div class="flex-1 min-w-0">
+            <div class="section-title">
+              <span>📢 最新发布</span>
+              <span class="more-link">查看全部 →</span>
+            </div>
+            <el-card shadow="never" class="overflow-hidden">
+              <!-- MIGRATION: Replace mock post data with real API data -->
+              <div v-for="(post, index) in latestPosts" :key="index" class="post-card flex items-start gap-4">
+                <div class="placeholder-img-sm flex-shrink-0">
+                  {{ post.emoji }}
+                </div>
+                <div class="flex-1 min-w-0">
+                  <div class="flex items-center justify-between mb-1">
+                    <h4 class="text-sm font-medium truncate pr-2">{{ post.title }}</h4>
+                    <el-tag size="small" round style="background: #FFE8D6; border-color: #FFE8D6; color: #8B6F5A; flex-shrink: 0;">{{ post.type }}</el-tag>
+                  </div>
+                  <div class="flex items-center gap-3 text-xs" style="color: #666;">
+                    <span v-if="post.price">💰 {{ post.price }}</span>
+                    <span>📍 {{ post.location }}</span>
+                    <span>🕐 {{ post.time }}</span>
+                  </div>
+                </div>
+                <el-tag size="small" :type="post.status === '进行中' || post.status === '拼单中' ? 'success' : 'warning'" effect="plain">
+                  {{ post.status }}
+                </el-tag>
+              </div>
+            </el-card>
+          </div>
+
+          <!-- Hot Collections -->
+          <div class="w-72 flex-shrink-0">
+            <div class="section-title">
+              <span>🔥 热门收藏</span>
+              <span class="more-link">更多 →</span>
+            </div>
+            <el-card shadow="never" :body-style="{ padding: '16px 20px' }">
+              <!-- MIGRATION: Replace mock hot collections with real trending data -->
+              <div v-for="(item, index) in hotCollections" :key="index" class="hot-item flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                  <span class="text-sm font-medium" :style="{ color: index < 3 ? '#cc9f7a' : '#333' }">{{ index + 1 }}.</span>
+                  <span class="text-sm truncate" style="max-width: 140px;">{{ item.title }}</span>
+                </div>
+                <el-tag size="small" style="background: #FFE8D6; border-color: #FFE8D6; color: #8B6F5A;">{{ item.count }} 收藏</el-tag>
+              </div>
+            </el-card>
+          </div>
+        </section>
+
+        <!-- Pagination -->
+        <!-- MIGRATION: Replace with server-side pagination -->
+        <div class="pagination-wrapper">
+          <el-pagination
+            v-model:current-page="currentPage"
+            :page-size="pageSize"
+            :total="total"
+            layout="prev, pager, next"
+            background
+            small
+          />
+        </div>
+      </div>
+
+      <!-- ====== RIGHT SIDEBAR: Message Badge ====== -->
+      <!-- MIGRATION: Replace badge count with real unread message count -->
+      <aside class="w-48 flex-shrink-0">
+        <div class="sticky-sidebar">
+          <el-card shadow="never" class="text-center" :body-style="{ padding: '20px 16px' }">
+            <el-badge :value="unreadCount" :max="99" class="message-badge">
+              <el-button circle size="large" style="background: #FFF9F3; border-color: #FFE8D6; font-size: 20px;">
+                💬
+              </el-button>
+            </el-badge>
+            <p class="text-xs mt-3" style="color: #666;">未读消息</p>
+          </el-card>
+
+          <!-- Quick Actions -->
+          <el-card shadow="never" class="mt-4" :body-style="{ padding: '16px' }">
+            <p class="text-xs font-medium mb-2" style="color: #666;">快捷操作</p>
+            <div class="flex flex-col gap-2">
+              <el-button size="small" round style="background: #FFF9F3; border-color: #FFE8D6; color: #333; justify-content: flex-start;" class="!w-full">
+                📝 我的发布
+              </el-button>
+              <el-button size="small" round style="background: #FFF9F3; border-color: #FFE8D6; color: #333; justify-content: flex-start;" class="!w-full">
+                ⭐ 我的收藏
+              </el-button>
+              <el-button size="small" round style="background: #FFF9F3; border-color: #FFE8D6; color: #333; justify-content: flex-start;" class="!w-full">
+                📋 历史记录
+              </el-button>
+            </div>
+          </el-card>
+        </div>
+      </aside>
+    </main>
+
+    <!-- ====== FIXED BOTTOM-RIGHT: Security Tip ====== -->
+    <!-- MIGRATION: Replace static tip with configurable announcement -->
+    <div class="fixed bottom-6 right-6 z-50 security-tip">
+      <el-card shadow="never" style="background: #FFF9F3; border: 1px solid #FFE8D6; border-radius: 12px;" :body-style="{ padding: '14px 18px' }">
+        <div class="flex items-start gap-3">
+          <span class="text-xl flex-shrink-0">🛡️</span>
+          <div>
+            <p class="text-xs font-medium mb-1" style="color: #333;">安全交易提醒</p>
+            <p class="text-xs" style="color: #666; line-height: 1.5;">
+              请勿私下转账！<br>
+              认准平台担保交易
+            </p>
+          </div>
+        </div>
+      </el-card>
+    </div>
+  </div>
+
+  <!-- ====== CDN SCRIPTS ====== -->
+  <!-- MIGRATION: Replace CDN scripts with local build imports -->
+  <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+  <script src="https://unpkg.com/element-plus"></script>
+  <script src="https://unpkg.com/@element-plus/icons-vue"></script>
+
+  <script>
+    const { createApp } = Vue;
+
+    const app = createApp({
+      data() {
+        return {
+          // MIGRATION: Fetch user info from auth API
+          userInfo: {
+            nickname: '校园小达人',
+            campus: '东校区 · 计算机学院',
+            creditScore: 98
+          },
+          // MIGRATION: Fetch categories from backend
+          quickEntries: [
+            { title: '二手交易', icon: '📚', desc: '闲置好物循环' },
+            { title: '失物招领', icon: '🔍', desc: '寻找失主/物品' },
+            { title: '拼单搭子', icon: '🤝', desc: '一起省钱快乐' },
+            { title: '跑腿委托', icon: '🏃', desc: '便捷校园生活' }
+          ],
+          // MIGRATION: Fetch latest posts from API with pagination
+          latestPosts: [
+            { title: '二手经济学教材（微宏观）', emoji: '📖', price: '¥25', location: '东区食堂三楼', time: '10分钟前', type: '二手', status: '在售' },
+            { title: '校园卡招领 - 张同学', emoji: '🪪', price: '', location: '图书馆二楼大厅', time: '30分钟前', type: '失物', status: '待认领' },
+            { title: '奶茶拼单！茶百道满减', emoji: '🧋', price: '', location: '北门茶百道', time: '1小时前', type: '拼单', status: '拼单中' },
+            { title: '代取韵达/顺丰快递', emoji: '📦', price: '¥5', location: '菜鸟驿站→南区宿舍', time: '2小时前', type: '跑腿', status: '进行中' },
+            { title: '全新高数辅导书（带笔记）', emoji: '📐', price: '¥18', location: '西区超市旁', time: '3小时前', type: '二手', status: '在售' }
+          ],
+          // MIGRATION: Fetch hot collections from analytics API
+          hotCollections: [
+            { title: '毕业季二手教材', count: 23 },
+            { title: '校园周边美食拼单', count: 18 },
+            { title: '最新失物信息汇总', count: 15 },
+            { title: '周末运动搭子招募', count: 12 },
+            { title: '考研资料互助专区', count: 10 }
+          ],
+          // MIGRATION: Replace with real unread count from message API
+          unreadCount: 3,
+          currentPage: 1,
+          pageSize: 10,
+          total: 100
+        };
+      }
+    });
+
+    // Register Element Plus icons
+    for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
+      app.component(key, component);
+    }
+
+    app.use(ElementPlus);
+    app.mount('#app');
+  </script>
+</body>
+</html>

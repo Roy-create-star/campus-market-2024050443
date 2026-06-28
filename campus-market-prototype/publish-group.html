@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<!--
+  ============================================
+  Migration Comment: 发布拼单表单页 (页面6 - 拼单搭子)
+  对应设计稿: 发布拼单搭子信息
+  需迁移为 Vue/Element Plus 组件
+  字段: title, campus, target_count, deadline, price_per_person, details, images
+  ============================================
+-->
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>校园轻集市 - 发布拼单</title>
+  <link rel="stylesheet" href="https://unpkg.com/element-plus/dist/index.css" />
+  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+  <script src="https://unpkg.com/element-plus/dist/index.full.min.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    :root {
+      --main: #FFE8D6;
+      --secondary: #FFF9F3;
+      --text-primary: #333;
+      --text-secondary: #666;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Helvetica Neue', Arial, sans-serif;
+      background: var(--secondary);
+      color: var(--text-primary);
+      min-height: 100vh;
+    }
+    .page-container { max-width: 1440px; margin: 0 auto; width: 100%; }
+    .top-bar {
+      background: var(--main);
+      padding: 16px 48px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      font-size: 18px;
+      font-weight: 600;
+    }
+    .top-bar .back-btn { font-size: 22px; cursor: pointer; text-decoration: none; color: inherit; line-height: 1; }
+    .content-area { padding: 40px 80px; }
+    .form-card {
+      background: #fff;
+      border: 2px solid var(--main);
+      border-radius: 20px;
+      padding: 48px 56px;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    .form-card .el-form-item { margin-bottom: 24px; }
+    .form-card .required-star { color: #f56c6c; margin-left: 2px; }
+    .btn-group { display: flex; gap: 20px; justify-content: center; margin-top: 40px; }
+    .btn-submit {
+      background: linear-gradient(135deg, #FFE8D6, #f5d0b0);
+      border: none; color: var(--text-primary); font-weight: 600;
+      padding: 12px 48px; border-radius: 12px; font-size: 16px; cursor: pointer;
+      transition: opacity 0.2s;
+    }
+    .btn-submit:hover { opacity: 0.85; }
+    .btn-reset {
+      background: #e0e0e0; border: none; color: var(--text-secondary);
+      font-weight: 500; padding: 12px 32px; border-radius: 12px; font-size: 16px; cursor: pointer;
+    }
+    .btn-reset:hover { background: #d0d0d0; }
+    .upload-area {
+      border: 2px dashed #ddd; border-radius: 12px; padding: 32px; text-align: center;
+      color: var(--text-secondary); font-size: 14px; cursor: pointer; transition: border-color 0.2s;
+    }
+    .upload-area:hover { border-color: var(--main); }
+    .upload-area .upload-icon { font-size: 40px; margin-bottom: 8px; }
+    .preview-list { display: flex; gap: 12px; margin-top: 12px; flex-wrap: wrap; }
+    .preview-item {
+      width: 80px; height: 80px; background: #f5f5f5; border-radius: 8px;
+      display: flex; align-items: center; justify-content: center; font-size: 28px; border: 1px solid #eee;
+    }
+    @media (max-width: 768px) {
+      .top-bar { padding: 16px; }
+      .content-area { padding: 24px 16px; }
+      .form-card { padding: 24px 20px; }
+    }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <div class="page-container">
+      <div class="top-bar">
+        <a href="publish.html" class="back-btn">&lt;</a>
+        <span>发布拼单信息</span>
+      </div>
+      <div class="content-area">
+        <div class="form-card">
+          <el-form label-position="top" :model="form">
+
+            <!-- 标题 -->
+            <el-form-item label="标题">
+              <template #label><span>标题<span class="required-star">*</span></span></template>
+              <el-input v-model="form.title" placeholder="如：奶茶买一送一拼单" />
+              <div style="color:#f56c6c;font-size:12px;margin-top:4px;">请输入拼单标题</div>
+            </el-form-item>
+
+            <!-- 所属校区 -->
+            <el-form-item label="所属校区">
+              <el-select v-model="form.campus" placeholder="请选择校区" style="width:100%;">
+                <el-option label="校本部" value="main" />
+                <el-option label="东校区" value="east" />
+                <el-option label="西校区" value="west" />
+                <el-option label="南校区" value="south" />
+              </el-select>
+            </el-form-item>
+
+            <!-- 目标人数 -->
+            <el-form-item label="目标参与人数">
+              <el-input-number v-model="form.targetCount" :min="2" :max="50" style="width:200px;" />
+              <div style="color:var(--text-secondary);font-size:12px;margin-top:4px;">含发起人，最少 2 人</div>
+            </el-form-item>
+
+            <!-- 截止时间 -->
+            <el-form-item label="拼单截止时间">
+              <el-date-picker v-model="form.deadline" type="datetime" placeholder="选择截止时间" style="width:100%;" />
+            </el-form-item>
+
+            <!-- 人均价格 -->
+            <el-form-item label="每人价格（元）">
+              <el-input-number v-model="form.pricePerPerson" :min="0" :precision="2" style="width:200px;" />
+            </el-form-item>
+
+            <!-- 拼单详情 -->
+            <el-form-item label="拼单详情">
+              <el-input v-model="form.details" type="textarea" :rows="4" placeholder="请描述拼单内容、商品链接、取货方式等" />
+            </el-form-item>
+
+            <!-- 图片 -->
+            <el-form-item label="上传图片">
+              <div class="upload-area">
+                <div class="upload-icon">📷</div>
+                <div>点击或拖拽上传图片</div>
+                <div style="font-size:12px;margin-top:4px;">支持 JPG/PNG，最多 6 张</div>
+              </div>
+              <div class="preview-list">
+                <div class="preview-item">🧋</div>
+                <div class="preview-item">🍱</div>
+              </div>
+            </el-form-item>
+
+          </el-form>
+
+          <div class="btn-group">
+            <button class="btn-submit">提交发布</button>
+            <button class="btn-reset">重置</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const { createApp, ref } = Vue;
+    const app = createApp({
+      setup() {
+        const form = ref({
+          title: '',
+          campus: '',
+          targetCount: 2,
+          deadline: '',
+          pricePerPerson: 0,
+          details: ''
+        });
+        return { form };
+      }
+    });
+    app.use(ElementPlus);
+    app.mount('#app');
+  </script>
+</body>
+</html>

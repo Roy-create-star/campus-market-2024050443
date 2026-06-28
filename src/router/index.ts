@@ -38,9 +38,37 @@ const router = createRouter({
       component: () => import('../views/ProfileView.vue'),
     },
     {
+      path: '/profile/edit',
+      name: 'EditProfile',
+      component: () => import('../views/EditProfileView.vue'),
+    },
+    {
+      path: '/profile/posts',
+      redirect: '/profile?tab=publish',
+    },
+    {
+      path: '/profile/favorites',
+      redirect: '/profile?tab=favorite',
+    },
+    {
+      path: '/settings',
+      name: 'Settings',
+      redirect: '/profile',
+    },
+    {
       path: '/board',
       name: 'Board',
       component: () => import('../views/BoardView.vue'),
+    },
+    {
+      path: '/identity',
+      name: 'Identity',
+      component: () => import('../views/IdentityView.vue'),
+    },
+    {
+      path: '/admin-review',
+      name: 'AdminReview',
+      component: () => import('../views/AdminReviewView.vue'),
     },
   ],
 })
