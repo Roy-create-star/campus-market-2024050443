@@ -104,6 +104,58 @@
       "image": "",
       "status": "open",
       "description": "2026考研数学复习全书，仅翻看了前两章。"
+    },
+    {
+      "title": "雨蛙",
+      "category": "数码配件",
+      "price": 66666,
+      "condition": "全新",
+      "location": "东苑4栋323",
+      "publisher": "当前用户",
+      "publishTime": "2026-06-30 06:13",
+      "image": "",
+      "status": "open",
+      "description": "全新，你值得拥有",
+      "id": 8
+    },
+    {
+      "title": "雨娃",
+      "category": "数码配件",
+      "price": 9999998,
+      "condition": "全新",
+      "location": "东苑4栋323",
+      "publisher": "当前用户",
+      "publishTime": "2026-06-30 06:18",
+      "image": "",
+      "status": "open",
+      "description": "你值得拥有",
+      "id": 9
+    },
+    {
+      "title": "雨娃",
+      "category": "教材资料",
+      "price": 6,
+      "condition": "全新",
+      "location": "323",
+      "publisher": "当前用户",
+      "publishTime": "2026-06-30 07:35",
+      "image": "",
+      "status": "open",
+      "description": "啦啦啦啦啦",
+      "id": 10
+    },
+    {
+      "title": "宋雨露",
+      "category": "鼻涕大王",
+      "price": 1,
+      "condition": "八成新",
+      "location": "实验室408",
+      "publisher": "当前用户",
+      "publishTime": "2026-06-30 07:48",
+      "image": "",
+      "status": "open",
+      "description": "鼻涕大王",
+      "id": 11
     }
   ],
   "lostFounds": [
@@ -323,99 +375,625 @@
     }
   ],
   "messages": [
-    { "id": 1, "conversationId": 1, "type": "text", "text": "你好，请问微积分教材还在吗？", "isMine": false, "time": "13:45", "sender": "小李同学" },
-    { "id": 2, "conversationId": 1, "type": "text", "text": "在的，昨天刚整理的，基本全新", "isMine": true, "time": "13:46", "sender": "我" },
-    { "id": 3, "conversationId": 1, "type": "text", "text": "太好了，价格可以便宜一点吗？", "isMine": false, "time": "13:48", "sender": "小李同学" },
-    { "id": 4, "conversationId": 1, "type": "price", "text": "最低50元可以吗？", "amount": 50, "isMine": true, "time": "13:50", "showActions": false, "sender": "我" },
-    { "id": 5, "conversationId": 1, "type": "price", "text": "45元行不行？我下午就能来拿", "amount": 45, "isMine": false, "time": "14:02", "showActions": true, "sender": "小李同学" },
-    { "id": 6, "conversationId": 1, "type": "text", "text": "好吧，那就45元，下午3点图书馆见", "isMine": true, "time": "14:30", "sender": "我" },
-    { "id": 7, "conversationId": 1, "type": "text", "text": "好的，那就45元成交吧", "isMine": false, "time": "14:32", "sender": "小李同学" },
-    { "id": 8, "conversationId": 2, "type": "text", "text": "你好，机械键盘还在吗？", "isMine": false, "time": "15:20", "sender": "王学长" },
-    { "id": 9, "conversationId": 2, "type": "text", "text": "在的，用了两个月", "isMine": true, "time": "15:21", "sender": "我" },
-    { "id": 10, "conversationId": 2, "type": "text", "text": "还能便宜一点吗？", "isMine": false, "time": "15:25", "sender": "王学长" }
+    {
+      "id": 1,
+      "conversationId": 1,
+      "type": "text",
+      "text": "你好，请问微积分教材还在吗？",
+      "isMine": false,
+      "time": "13:45",
+      "sender": "小李同学"
+    },
+    {
+      "id": 2,
+      "conversationId": 1,
+      "type": "text",
+      "text": "在的，昨天刚整理的，基本全新",
+      "isMine": true,
+      "time": "13:46",
+      "sender": "我"
+    },
+    {
+      "id": 3,
+      "conversationId": 1,
+      "type": "text",
+      "text": "太好了，价格可以便宜一点吗？",
+      "isMine": false,
+      "time": "13:48",
+      "sender": "小李同学"
+    },
+    {
+      "id": 4,
+      "conversationId": 1,
+      "type": "price",
+      "text": "最低50元可以吗？",
+      "amount": 50,
+      "isMine": true,
+      "time": "13:50",
+      "showActions": false,
+      "sender": "我"
+    },
+    {
+      "id": 5,
+      "conversationId": 1,
+      "type": "price",
+      "text": "45元行不行？我下午就能来拿",
+      "amount": 45,
+      "isMine": false,
+      "time": "14:02",
+      "showActions": true,
+      "sender": "小李同学"
+    },
+    {
+      "id": 6,
+      "conversationId": 1,
+      "type": "text",
+      "text": "好吧，那就45元，下午3点图书馆见",
+      "isMine": true,
+      "time": "14:30",
+      "sender": "我"
+    },
+    {
+      "id": 7,
+      "conversationId": 1,
+      "type": "text",
+      "text": "好的，那就45元成交吧",
+      "isMine": false,
+      "time": "14:32",
+      "sender": "小李同学"
+    },
+    {
+      "id": 8,
+      "conversationId": 2,
+      "type": "text",
+      "text": "你好，机械键盘还在吗？",
+      "isMine": false,
+      "time": "15:20",
+      "sender": "王学长"
+    },
+    {
+      "id": 9,
+      "conversationId": 2,
+      "type": "text",
+      "text": "在的，用了两个月",
+      "isMine": true,
+      "time": "15:21",
+      "sender": "我"
+    },
+    {
+      "id": 10,
+      "conversationId": 2,
+      "type": "text",
+      "text": "还能便宜一点吗？",
+      "isMine": false,
+      "time": "15:25",
+      "sender": "王学长"
+    }
   ],
   "conversations": [
-    { "id": 1, "name": "小李同学", "avatar": "", "itemId": 101, "itemName": "微积分教材", "lastMsg": "好的，那就45元成交吧", "lastMsgType": "price", "lastTime": "14:32", "unread": 2 },
-    { "id": 2, "name": "张学姐", "avatar": "", "itemId": 102, "itemName": "台灯", "lastMsg": "没问题，明天下午3点图书馆见", "lastMsgType": "text", "lastTime": "昨天", "unread": 0 },
-    { "id": 3, "name": "王学长", "avatar": "", "itemId": 103, "itemName": "机械键盘", "lastMsg": "还能便宜一点吗？", "lastMsgType": "text", "lastTime": "昨天", "unread": 1 },
-    { "id": 4, "name": "大二-陈", "avatar": "", "itemId": 104, "itemName": "英语四级真题", "lastMsg": "好的，我已经付款了", "lastMsgType": "text", "lastTime": "周三", "unread": 0 },
-    { "id": 5, "name": "赵同学", "avatar": "", "itemId": 105, "itemName": "瑜伽垫", "lastMsg": "还在吗？", "lastMsgType": "text", "lastTime": "周一", "unread": 3 },
-    { "id": 6, "name": "刘学姐", "avatar": "", "itemId": 106, "itemName": "画板套装", "lastMsg": "30元可以吗？", "lastMsgType": "price", "lastTime": "2025-06-20", "unread": 0 }
+    {
+      "id": 1,
+      "name": "小李同学",
+      "avatar": "",
+      "itemId": 101,
+      "itemName": "微积分教材",
+      "lastMsg": "好的，那就45元成交吧",
+      "lastMsgType": "price",
+      "lastTime": "14:32",
+      "unread": 2
+    },
+    {
+      "id": 2,
+      "name": "张学姐",
+      "avatar": "",
+      "itemId": 102,
+      "itemName": "台灯",
+      "lastMsg": "没问题，明天下午3点图书馆见",
+      "lastMsgType": "text",
+      "lastTime": "昨天",
+      "unread": 0
+    },
+    {
+      "id": 3,
+      "name": "王学长",
+      "avatar": "",
+      "itemId": 103,
+      "itemName": "机械键盘",
+      "lastMsg": "还能便宜一点吗？",
+      "lastMsgType": "text",
+      "lastTime": "昨天",
+      "unread": 1
+    },
+    {
+      "id": 4,
+      "name": "大二-陈",
+      "avatar": "",
+      "itemId": 104,
+      "itemName": "英语四级真题",
+      "lastMsg": "好的，我已经付款了",
+      "lastMsgType": "text",
+      "lastTime": "周三",
+      "unread": 0
+    },
+    {
+      "id": 5,
+      "name": "赵同学",
+      "avatar": "",
+      "itemId": 105,
+      "itemName": "瑜伽垫",
+      "lastMsg": "还在吗？",
+      "lastMsgType": "text",
+      "lastTime": "周一",
+      "unread": 3
+    },
+    {
+      "id": 6,
+      "name": "刘学姐",
+      "avatar": "",
+      "itemId": 106,
+      "itemName": "画板套装",
+      "lastMsg": "30元可以吗？",
+      "lastMsgType": "price",
+      "lastTime": "2025-06-20",
+      "unread": 0
+    }
   ],
   "chatItems": [
-    { "id": 101, "name": "微积分教材", "price": 45, "status": "在售" },
-    { "id": 102, "name": "台灯", "price": 20, "status": "已售" },
-    { "id": 103, "name": "机械键盘", "price": 120, "status": "在售" },
-    { "id": 104, "name": "英语四级真题", "price": 25, "status": "在售" },
-    { "id": 105, "name": "瑜伽垫", "price": 35, "status": "在售" },
-    { "id": 106, "name": "画板套装", "price": 50, "status": "在售" }
+    {
+      "id": 101,
+      "name": "微积分教材",
+      "price": 45,
+      "status": "在售"
+    },
+    {
+      "id": 102,
+      "name": "台灯",
+      "price": 20,
+      "status": "已售"
+    },
+    {
+      "id": 103,
+      "name": "机械键盘",
+      "price": 120,
+      "status": "在售"
+    },
+    {
+      "id": 104,
+      "name": "英语四级真题",
+      "price": 25,
+      "status": "在售"
+    },
+    {
+      "id": 105,
+      "name": "瑜伽垫",
+      "price": 35,
+      "status": "在售"
+    },
+    {
+      "id": 106,
+      "name": "画板套装",
+      "price": 50,
+      "status": "在售"
+    }
   ],
   "reviews": [
-    { "id": 1, "title": "高等数学第七版教材", "type": "二手", "publisher": "张同学", "publishTime": "2024-01-15 14:30", "status": "approved", "price": "25.00", "description": "高等数学第七版上册教材，九成新，内页有少量笔记，不影响使用。价格可小刀，校本部自取。", "images": ["https://via.placeholder.com/100/f5cba7/333?text=Book"], "campus": "校本部", "contact": "138****5678" },
-    { "id": 2, "title": "校园卡丢失（一卡通）", "type": "失物", "publisher": "李同学", "publishTime": "2024-01-15 10:20", "status": "pending", "description": "在东校区食堂丢失校园卡一张，卡号2023****78，捡到请联系，谢谢！", "images": ["https://via.placeholder.com/100/E6F4EA/333?text=Card"], "campus": "东校区", "contact": "159****2345" },
-    { "id": 3, "title": "周末拼车去市中心", "type": "拼单", "publisher": "王同学", "publishTime": "2024-01-14 18:00", "status": "pending", "description": "周六下午拼车去市中心万达广场，已有2人，再找2位，人均15元。", "images": ["https://via.placeholder.com/100/FFDCC0/333?text=Car"], "campus": "西校区", "contact": "177****8901" },
-    { "id": 4, "title": "代取快递（南区宿舍）", "type": "跑腿", "publisher": "赵同学", "publishTime": "2024-01-14 16:45", "status": "approved", "description": "可代取南区菜鸟驿站快递，送到宿舍楼下，每单3元，量大优惠。", "images": ["https://via.placeholder.com/100/FFF0E3/333?text=Package"], "campus": "南校区", "contact": "136****4321" },
-    { "id": 5, "title": "二手电动车低价转让", "type": "二手", "publisher": "陈同学", "publishTime": "2024-01-14 09:15", "status": "rejected", "price": "800.00", "description": "毕业离校转让电动车，使用两年，电池续航良好，价格可议。", "images": ["https://via.placeholder.com/100/f5cba7/333?text=E-Bike"], "campus": "校本部", "contact": "188****6789" },
-    { "id": 6, "title": "英语四级真题试卷全套", "type": "二手", "publisher": "刘同学", "publishTime": "2024-01-13 20:30", "status": "approved", "price": "15.00", "description": "2023年12月四级真题全套，含听力光盘，几乎全新。", "images": ["https://via.placeholder.com/100/f5cba7/333?text=Exam"], "campus": "东校区", "contact": "155****3456" },
-    { "id": 7, "title": "寻物启事：黑色钱包", "type": "失物", "publisher": "吴同学", "publishTime": "2024-01-13 12:00", "status": "pending", "description": "在图书馆三楼丢失黑色短款钱包，内有身份证和学生证，非常重要！", "images": ["https://via.placeholder.com/100/E6F4EA/333?text=Purse"], "campus": "校本部", "contact": "166****7890" },
-    { "id": 8, "title": "周末羽毛球局招募", "type": "拼单", "publisher": "郑同学", "publishTime": "2024-01-12 15:20", "status": "approved", "description": "周日下午2-5点打羽毛球，场馆已订，缺3人，费用AA约20元/人。", "images": ["https://via.placeholder.com/100/FFDCC0/333?text=Sports"], "campus": "西校区", "contact": "199****0123" },
-    { "id": 9, "title": "代买早餐（北区食堂）", "type": "跑腿", "publisher": "孙同学", "publishTime": "2024-01-12 07:40", "status": "rejected", "description": "每天早上7:30-8:00可代买北区食堂早餐，送到教学楼。", "images": ["https://via.placeholder.com/100/FFF0E3/333?text=Food"], "campus": "北校区", "contact": "137****5678" },
-    { "id": 10, "title": "计算机二级教材+题库", "type": "二手", "publisher": "周同学", "publishTime": "2024-01-11 22:10", "status": "pending", "price": "30.00", "description": "计算机二级MS Office教材附题库光盘，全新未使用。", "images": ["https://via.placeholder.com/100/f5cba7/333?text=Computer"], "campus": "校本部", "contact": "150****2345" }
+    {
+      "id": 1,
+      "title": "高等数学第七版教材",
+      "type": "二手",
+      "publisher": "张同学",
+      "publishTime": "2024-01-15 14:30",
+      "status": "approved",
+      "price": "25.00",
+      "description": "高等数学第七版上册教材，九成新，内页有少量笔记，不影响使用。价格可小刀，校本部自取。",
+      "images": [
+        "https://via.placeholder.com/100/f5cba7/333?text=Book"
+      ],
+      "campus": "校本部",
+      "contact": "138****5678"
+    },
+    {
+      "id": 2,
+      "title": "校园卡丢失（一卡通）",
+      "type": "失物",
+      "publisher": "李同学",
+      "publishTime": "2024-01-15 10:20",
+      "status": "pending",
+      "description": "在东校区食堂丢失校园卡一张，卡号2023****78，捡到请联系，谢谢！",
+      "images": [
+        "https://via.placeholder.com/100/E6F4EA/333?text=Card"
+      ],
+      "campus": "东校区",
+      "contact": "159****2345"
+    },
+    {
+      "id": 3,
+      "title": "周末拼车去市中心",
+      "type": "拼单",
+      "publisher": "王同学",
+      "publishTime": "2024-01-14 18:00",
+      "status": "pending",
+      "description": "周六下午拼车去市中心万达广场，已有2人，再找2位，人均15元。",
+      "images": [
+        "https://via.placeholder.com/100/FFDCC0/333?text=Car"
+      ],
+      "campus": "西校区",
+      "contact": "177****8901"
+    },
+    {
+      "id": 4,
+      "title": "代取快递（南区宿舍）",
+      "type": "跑腿",
+      "publisher": "赵同学",
+      "publishTime": "2024-01-14 16:45",
+      "status": "approved",
+      "description": "可代取南区菜鸟驿站快递，送到宿舍楼下，每单3元，量大优惠。",
+      "images": [
+        "https://via.placeholder.com/100/FFF0E3/333?text=Package"
+      ],
+      "campus": "南校区",
+      "contact": "136****4321"
+    },
+    {
+      "id": 5,
+      "title": "二手电动车低价转让",
+      "type": "二手",
+      "publisher": "陈同学",
+      "publishTime": "2024-01-14 09:15",
+      "status": "rejected",
+      "price": "800.00",
+      "description": "毕业离校转让电动车，使用两年，电池续航良好，价格可议。",
+      "images": [
+        "https://via.placeholder.com/100/f5cba7/333?text=E-Bike"
+      ],
+      "campus": "校本部",
+      "contact": "188****6789"
+    },
+    {
+      "id": 6,
+      "title": "英语四级真题试卷全套",
+      "type": "二手",
+      "publisher": "刘同学",
+      "publishTime": "2024-01-13 20:30",
+      "status": "approved",
+      "price": "15.00",
+      "description": "2023年12月四级真题全套，含听力光盘，几乎全新。",
+      "images": [
+        "https://via.placeholder.com/100/f5cba7/333?text=Exam"
+      ],
+      "campus": "东校区",
+      "contact": "155****3456"
+    },
+    {
+      "id": 7,
+      "title": "寻物启事：黑色钱包",
+      "type": "失物",
+      "publisher": "吴同学",
+      "publishTime": "2024-01-13 12:00",
+      "status": "pending",
+      "description": "在图书馆三楼丢失黑色短款钱包，内有身份证和学生证，非常重要！",
+      "images": [
+        "https://via.placeholder.com/100/E6F4EA/333?text=Purse"
+      ],
+      "campus": "校本部",
+      "contact": "166****7890"
+    },
+    {
+      "id": 8,
+      "title": "周末羽毛球局招募",
+      "type": "拼单",
+      "publisher": "郑同学",
+      "publishTime": "2024-01-12 15:20",
+      "status": "approved",
+      "description": "周日下午2-5点打羽毛球，场馆已订，缺3人，费用AA约20元/人。",
+      "images": [
+        "https://via.placeholder.com/100/FFDCC0/333?text=Sports"
+      ],
+      "campus": "西校区",
+      "contact": "199****0123"
+    },
+    {
+      "id": 9,
+      "title": "代买早餐（北区食堂）",
+      "type": "跑腿",
+      "publisher": "孙同学",
+      "publishTime": "2024-01-12 07:40",
+      "status": "rejected",
+      "description": "每天早上7:30-8:00可代买北区食堂早餐，送到教学楼。",
+      "images": [
+        "https://via.placeholder.com/100/FFF0E3/333?text=Food"
+      ],
+      "campus": "北校区",
+      "contact": "137****5678"
+    },
+    {
+      "id": 10,
+      "title": "计算机二级教材+题库",
+      "type": "二手",
+      "publisher": "周同学",
+      "publishTime": "2024-01-11 22:10",
+      "status": "pending",
+      "price": "30.00",
+      "description": "计算机二级MS Office教材附题库光盘，全新未使用。",
+      "images": [
+        "https://via.placeholder.com/100/f5cba7/333?text=Computer"
+      ],
+      "campus": "校本部",
+      "contact": "150****2345"
+    }
   ],
   "profilePosts": [
-    { "id": 1, "title": "二手高数课本第六版", "price": 25, "date": "2026-06-20", "status": "ongoing", "img": "https://picsum.photos/seed/math-textbook/120/120" },
-    { "id": 2, "title": "全新计算器 fx-991CNX", "price": 120, "date": "2026-06-18", "status": "ongoing", "img": "https://picsum.photos/seed/calculator/120/120" },
-    { "id": 3, "title": "宿舍用小冰箱 便携", "price": 80, "date": "2026-06-15", "status": "completed", "img": "https://picsum.photos/seed/mini-fridge/120/120" },
-    { "id": 4, "title": "大学物理笔记 手写", "price": 15, "date": "2026-06-10", "status": "closed", "img": "https://picsum.photos/seed/physics-notes/120/120" },
-    { "id": 5, "title": "篮球 斯伯丁正品", "price": 55, "date": "2026-06-08", "status": "ongoing", "img": "https://picsum.photos/seed/basketball/120/120" }
+    {
+      "id": 1,
+      "title": "二手高数课本第六版",
+      "price": 25,
+      "date": "2026-06-20",
+      "status": "ongoing",
+      "img": "https://picsum.photos/seed/math-textbook/120/120"
+    },
+    {
+      "id": 2,
+      "title": "全新计算器 fx-991CNX",
+      "price": 120,
+      "date": "2026-06-18",
+      "status": "ongoing",
+      "img": "https://picsum.photos/seed/calculator/120/120"
+    },
+    {
+      "id": 3,
+      "title": "宿舍用小冰箱 便携",
+      "price": 80,
+      "date": "2026-06-15",
+      "status": "completed",
+      "img": "https://picsum.photos/seed/mini-fridge/120/120"
+    },
+    {
+      "id": 4,
+      "title": "大学物理笔记 手写",
+      "price": 15,
+      "date": "2026-06-10",
+      "status": "closed",
+      "img": "https://picsum.photos/seed/physics-notes/120/120"
+    },
+    {
+      "id": 5,
+      "title": "篮球 斯伯丁正品",
+      "price": 55,
+      "date": "2026-06-08",
+      "status": "ongoing",
+      "img": "https://picsum.photos/seed/basketball/120/120"
+    }
   ],
   "favorites": [
-    { "id": 1, "title": "机械键盘 青轴", "price": 89, "img": "https://picsum.photos/seed/keyboard/120/120" },
-    { "id": 2, "title": "英语六级真题", "price": 20, "img": "https://picsum.photos/seed/english-book/120/120" },
-    { "id": 3, "title": "瑜伽垫 加厚", "price": 35, "img": "https://picsum.photos/seed/yoga-mat/120/120" },
-    { "id": 4, "title": "台灯 LED 护眼", "price": 45, "img": "https://picsum.photos/seed/desk-lamp/120/120" },
-    { "id": 5, "title": "移动电源 20000mAh", "price": 60, "img": "https://picsum.photos/seed/powerbank/120/120" },
-    { "id": 6, "title": "画板 4K 美术生", "price": 30, "img": "https://picsum.photos/seed/drawing-board/120/120" }
+    {
+      "id": 1,
+      "title": "机械键盘 青轴",
+      "price": 89,
+      "img": "https://picsum.photos/seed/keyboard/120/120"
+    },
+    {
+      "id": 2,
+      "title": "英语六级真题",
+      "price": 20,
+      "img": "https://picsum.photos/seed/english-book/120/120"
+    },
+    {
+      "id": 3,
+      "title": "瑜伽垫 加厚",
+      "price": 35,
+      "img": "https://picsum.photos/seed/yoga-mat/120/120"
+    },
+    {
+      "id": 4,
+      "title": "台灯 LED 护眼",
+      "price": 45,
+      "img": "https://picsum.photos/seed/desk-lamp/120/120"
+    },
+    {
+      "id": 5,
+      "title": "移动电源 20000mAh",
+      "price": 60,
+      "img": "https://picsum.photos/seed/powerbank/120/120"
+    },
+    {
+      "id": 6,
+      "title": "画板 4K 美术生",
+      "price": 30,
+      "img": "https://picsum.photos/seed/drawing-board/120/120"
+    }
   ],
   "stats": [
-    { "id": 1, "label": "总发布量", "value": "45", "detail": "累计发布商品与帖子总量" },
-    { "id": 2, "label": "收藏总量", "value": "128", "detail": "所有用户收藏总数" },
-    { "id": 3, "label": "消息总数", "value": "256", "detail": "站内即时消息总条数" },
-    { "id": 4, "label": "本周新增", "value": "12", "detail": "本周新增发布量" }
+    {
+      "id": 1,
+      "label": "总发布量",
+      "value": "45",
+      "detail": "累计发布商品与帖子总量"
+    },
+    {
+      "id": 2,
+      "label": "收藏总量",
+      "value": "128",
+      "detail": "所有用户收藏总数"
+    },
+    {
+      "id": 3,
+      "label": "消息总数",
+      "value": "256",
+      "detail": "站内即时消息总条数"
+    },
+    {
+      "id": 4,
+      "label": "本周新增",
+      "value": "12",
+      "detail": "本周新增发布量"
+    }
   ],
   "hotItems": [
-    { "id": 1, "title": "高等数学第七版教材", "views": 120, "favorites": 45 },
-    { "id": 2, "title": "校园卡丢失寻回", "views": 98, "favorites": 32 },
-    { "id": 3, "title": "周末拼车去市区", "views": 87, "favorites": 28 },
-    { "id": 4, "title": "代取快递（南区）", "views": 76, "favorites": 22 },
-    { "id": 5, "title": "二手电动车转让", "views": 65, "favorites": 19 },
-    { "id": 6, "title": "英语四级真题全套", "views": 54, "favorites": 16 },
-    { "id": 7, "title": "羽毛球拍低价出", "views": 48, "favorites": 14 }
+    {
+      "id": 1,
+      "title": "高等数学第七版教材",
+      "views": 120,
+      "favorites": 45
+    },
+    {
+      "id": 2,
+      "title": "校园卡丢失寻回",
+      "views": 98,
+      "favorites": 32
+    },
+    {
+      "id": 3,
+      "title": "周末拼车去市区",
+      "views": 87,
+      "favorites": 28
+    },
+    {
+      "id": 4,
+      "title": "代取快递（南区）",
+      "views": 76,
+      "favorites": 22
+    },
+    {
+      "id": 5,
+      "title": "二手电动车转让",
+      "views": 65,
+      "favorites": 19
+    },
+    {
+      "id": 6,
+      "title": "英语四级真题全套",
+      "views": 54,
+      "favorites": 16
+    },
+    {
+      "id": 7,
+      "title": "羽毛球拍低价出",
+      "views": 48,
+      "favorites": 14
+    }
   ],
   "quickEntries": [
-    { "id": 1, "title": "二手交易", "desc": "闲置好物循环", "imgKey": "secondhand" },
-    { "id": 2, "title": "失物招领", "desc": "寻找失主/物品", "imgKey": "lost-found" },
-    { "id": 3, "title": "拼单搭子", "desc": "一起省钱快乐", "imgKey": "group-buy" },
-    { "id": 4, "title": "跑腿委托", "desc": "便捷校园生活", "imgKey": "errand" }
+    {
+      "id": 1,
+      "title": "二手交易",
+      "desc": "闲置好物循环",
+      "imgKey": "secondhand"
+    },
+    {
+      "id": 2,
+      "title": "失物招领",
+      "desc": "寻找失主/物品",
+      "imgKey": "lost-found"
+    },
+    {
+      "id": 3,
+      "title": "拼单搭子",
+      "desc": "一起省钱快乐",
+      "imgKey": "group-buy"
+    },
+    {
+      "id": 4,
+      "title": "跑腿委托",
+      "desc": "便捷校园生活",
+      "imgKey": "errand"
+    }
   ],
   "hotCollections": [
-    { "id": 1, "title": "毕业季二手教材", "count": 23 },
-    { "id": 2, "title": "校园周边美食拼单", "count": 18 },
-    { "id": 3, "title": "最新失物信息汇总", "count": 15 },
-    { "id": 4, "title": "周末运动搭子招募", "count": 12 },
-    { "id": 5, "title": "考研资料互助专区", "count": 10 }
+    {
+      "id": 1,
+      "title": "毕业季二手教材",
+      "count": 23
+    },
+    {
+      "id": 2,
+      "title": "校园周边美食拼单",
+      "count": 18
+    },
+    {
+      "id": 3,
+      "title": "最新失物信息汇总",
+      "count": 15
+    },
+    {
+      "id": 4,
+      "title": "周末运动搭子招募",
+      "count": 12
+    },
+    {
+      "id": 5,
+      "title": "考研资料互助专区",
+      "count": 10
+    }
   ],
   "latestPosts": [
-    { "id": 1, "title": "MacBook Air M2 2023款", "imgKey": "macbook", "price": "¥6,500", "location": "东区食堂", "time": "10分钟前", "type": "二手", "status": "在售" },
-    { "id": 2, "title": "捡到学生证 - 李明", "imgKey": "student-id", "price": "", "location": "图书馆二楼", "time": "25分钟前", "type": "失物", "status": "待认领" },
-    { "id": 3, "title": "喜茶多肉葡萄拼单", "imgKey": "tea", "price": "", "location": "北门喜茶店", "time": "1小时前", "type": "拼单", "status": "拼单中" },
-    { "id": 4, "title": "代取中通/圆通快递", "imgKey": "package", "price": "¥8", "location": "菜鸟→东区宿舍", "time": "45分钟前", "type": "跑腿", "status": "进行中" },
-    { "id": 5, "title": "全新高等数学第七版", "imgKey": "math-book", "price": "¥28", "location": "西区超市", "time": "2小时前", "type": "二手", "status": "在售" }
+    {
+      "id": 1,
+      "title": "MacBook Air M2 2023款",
+      "imgKey": "macbook",
+      "price": "¥6,500",
+      "location": "东区食堂",
+      "time": "10分钟前",
+      "type": "二手",
+      "status": "在售"
+    },
+    {
+      "id": 2,
+      "title": "捡到学生证 - 李明",
+      "imgKey": "student-id",
+      "price": "",
+      "location": "图书馆二楼",
+      "time": "25分钟前",
+      "type": "失物",
+      "status": "待认领"
+    },
+    {
+      "id": 3,
+      "title": "喜茶多肉葡萄拼单",
+      "imgKey": "tea",
+      "price": "",
+      "location": "北门喜茶店",
+      "time": "1小时前",
+      "type": "拼单",
+      "status": "拼单中"
+    },
+    {
+      "id": 4,
+      "title": "代取中通/圆通快递",
+      "imgKey": "package",
+      "price": "¥8",
+      "location": "菜鸟→东区宿舍",
+      "time": "45分钟前",
+      "type": "跑腿",
+      "status": "进行中"
+    },
+    {
+      "id": 5,
+      "title": "全新高等数学第七版",
+      "imgKey": "math-book",
+      "price": "¥28",
+      "location": "西区超市",
+      "time": "2小时前",
+      "type": "二手",
+      "status": "在售"
+    }
   ],
   "colleges": [
-    "计算机学院", "软件学院", "信息与电子工程学院", "数学科学学院", "物理学院", "外国语学院", "经济学院", "管理学院", "法学院", "医学院"
+    "计算机学院",
+    "软件学院",
+    "信息与电子工程学院",
+    "数学科学学院",
+    "物理学院",
+    "外国语学院",
+    "经济学院",
+    "管理学院",
+    "法学院",
+    "医学院"
   ],
   "campuses": [
-    "紫金港校区", "玉泉校区", "西溪校区", "华家池校区", "之江校区"
+    "紫金港校区",
+    "玉泉校区",
+    "西溪校区",
+    "华家池校区",
+    "之江校区"
   ]
 }

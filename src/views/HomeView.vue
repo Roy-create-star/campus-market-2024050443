@@ -1,8 +1,12 @@
 <script setup lang="ts">
-import { ref, reactive, computed } from 'vue'
+import { ref, reactive, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElCard, ElButton, ElTag, ElRow, ElCol, ElBadge } from 'element-plus'
 import { useUserStore } from '../stores/user'
+import { getTrades, type TradeItem } from '../api/trade'
+import { getLostFounds, type LostFoundItem } from '../api/lostFound'
+import { getGroupBuys, type GroupBuyItem } from '../api/groupBuy'
+import { getErrands, type ErrandItem } from '../api/errand'
 
 const router = useRouter()
 const userStore = useUserStore()
@@ -22,6 +26,7 @@ interface LatestPost {
   time: string
   type: string
   status: string
+  dataType: string
 }
 
 interface HotCollection {
@@ -36,13 +41,76 @@ const quickEntries = reactive<QuickEntry[]>([
   { title: '跑腿委托', desc: '便捷校园生活', imgKey: 'errand' }
 ])
 
-const latestPosts = reactive<LatestPost[]>([
-  { id: 1, title: 'MacBook Air M2 2023款', imgKey: 'macbook', price: '¥6,500', location: '东区食堂', time: '10分钟前', type: '二手', status: '在售' },
-  { id: 2, title: '捡到学生证 - 李明', imgKey: 'student-id', price: '', location: '图书馆二楼', time: '25分钟前', type: '失物', status: '待认领' },
-  { id: 3, title: '喜茶多肉葡萄拼单', imgKey: 'tea', price: '', location: '北门喜茶店', time: '1小时前', type: '拼单', status: '拼单中' },
-  { id: 4, title: '代取中通/圆通快递', imgKey: 'package', price: '¥8', location: '菜鸟→东区宿舍', time: '45分钟前', type: '跑腿', status: '进行中' },
-  { id: 5, title: '全新高等数学第七版', imgKey: 'math-book', price: '¥28', location: '西区超市', time: '2小时前', type: '二手', status: '在售' }
-])
+const latestPosts = reactive<LatestPost[]>([])
+
+onMounted(async () => {
+  const [tradeRes, lostRes, groupRes, errandRes] = await Promise.all([
+    getTrades(),
+    getLostFounds(),
+    getGroupBuys(),
+    getErrands()
+  ])
+
+  const all: LatestPost[] = []
+
+  tradeRes.data.slice(0, 3).forEach((item: TradeItem) => {
+    all.push({
+      id: item.id,
+      title: item.title,
+      imgKey: 'home-trade-' + item.id,
+      price: '¥' + item.price,
+      dataType: 'trade',
+      location: item.location,
+      time: item.publishTime,
+      type: '二手',
+      status: item.status === 'open' ? '在售' : '已关闭',
+    })
+  })
+
+  lostRes.data.slice(0, 2).forEach((item: LostFoundItem) => {
+    all.push({
+      id: item.id,
+      title: item.title,
+      imgKey: 'home-lost-' + item.id,
+      price: '',
+      dataType: 'lostFound',
+      location: item.location,
+      time: item.eventTime,
+      type: '失物',
+      status: item.status === 'open' ? '待认领' : '已找回',
+    })
+  })
+
+  groupRes.data.slice(0, 2).forEach((item: GroupBuyItem) => {
+    all.push({
+      id: item.id,
+      title: item.title,
+      imgKey: 'home-group-' + item.id,
+      price: '',
+      dataType: 'groupBuy',
+      location: item.location,
+      time: item.deadline,
+      type: '拼单',
+      status: item.status === 'open' ? '拼单中' : '已结束',
+    })
+  })
+
+  errandRes.data.slice(0, 2).forEach((item: ErrandItem) => {
+    all.push({
+      id: item.id,
+      title: item.title,
+      imgKey: 'home-errand-' + item.id,
+      price: '¥' + item.reward,
+      dataType: 'errand',
+      location: item.to,
+      time: item.deadline,
+      type: '跑腿',
+      status: item.status === 'open' ? '进行中' : '已完成',
+    })
+  })
+
+  latestPosts.splice(0, latestPosts.length, ...all)
+})
 
 const hotCollections = reactive<HotCollection[]>([
   { title: '毕业季二手教材', count: 23 },
@@ -116,7 +184,7 @@ const navToHotSearch = (title: string) => {
             <span class="more-link" @click="navTo('/list')">查看全部 →</span>
           </div>
           <ElCard shadow="never">
-            <div v-for="(post, index) in latestPosts" :key="post.id" class="post-card" @click="navTo('/detail/' + post.id)">
+            <div v-for="(post, index) in latestPosts" :key="post.id" class="post-card" @click="navTo('/detail/' + post.id + '?type=' + post.dataType)">
               <img class="post-img" :src="'https://picsum.photos/seed/' + post.imgKey + '/80/80'" :alt="post.title" width="80" height="80" />
               <div class="post-info">
                 <div class="post-header">

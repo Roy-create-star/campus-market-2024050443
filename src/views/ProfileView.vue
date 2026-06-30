@@ -1,8 +1,12 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { ElCard, ElButton, ElTag, ElTabs, ElTabPane, ElDialog, ElRadioGroup, ElRadio, ElMessage, ElEmpty } from 'element-plus'
 import { useUserStore } from '../stores/user'
+import { getTrades, type TradeItem } from '../api/trade'
+import { getLostFounds, type LostFoundItem } from '../api/lostFound'
+import { getGroupBuys, type GroupBuyItem } from '../api/groupBuy'
+import { getErrands, type ErrandItem } from '../api/errand'
 
 const router = useRouter()
 const route = useRoute()
@@ -10,25 +14,83 @@ const userStore = useUserStore()
 
 const activeTab = ref('publish')
 
-onMounted(() => {
+interface MyPost {
+  id: number
+  title: string
+  price: number
+  date: string
+  status: string
+  img: string
+}
+
+const myPosts = ref<MyPost[]>([])
+
+onMounted(async () => {
   if (route.query.tab === 'favorite') {
     activeTab.value = 'favorite'
   }
+
+  const [tradeRes, lostRes, groupRes, errandRes] = await Promise.all([
+    getTrades(),
+    getLostFounds(),
+    getGroupBuys(),
+    getErrands()
+  ])
+
+  const all: MyPost[] = []
+
+  tradeRes.data.forEach((item: TradeItem) => {
+    all.push({
+      id: item.id,
+      title: item.title,
+      price: item.price,
+      date: item.publishTime,
+      status: item.status === 'open' ? 'ongoing' : 'closed',
+      img: 'https://picsum.photos/seed/profile-trade-' + item.id + '/120/120',
+    })
+  })
+
+  lostRes.data.forEach((item: LostFoundItem) => {
+    all.push({
+      id: item.id,
+      title: item.title,
+      price: 0,
+      date: item.eventTime,
+      status: item.status === 'open' ? 'ongoing' : 'closed',
+      img: 'https://picsum.photos/seed/profile-lost-' + item.id + '/120/120',
+    })
+  })
+
+  groupRes.data.forEach((item: GroupBuyItem) => {
+    all.push({
+      id: item.id,
+      title: item.title,
+      price: 0,
+      date: item.deadline,
+      status: item.status === 'open' ? 'ongoing' : 'closed',
+      img: 'https://picsum.photos/seed/profile-group-' + item.id + '/120/120',
+    })
+  })
+
+  errandRes.data.forEach((item: ErrandItem) => {
+    all.push({
+      id: item.id,
+      title: item.title,
+      price: item.reward,
+      date: item.deadline,
+      status: item.status === 'open' ? 'ongoing' : 'closed',
+      img: 'https://picsum.photos/seed/profile-errand-' + item.id + '/120/120',
+    })
+  })
+
+  myPosts.value = all
 })
 
-const stats = {
-  posts: 12,
+const stats = computed(() => ({
+  posts: myPosts.value.length,
   favorites: 8,
   reviews: 5,
-}
-
-const myPosts = ref([
-  { title: '二手高数课本第六版', price: 25, date: '2026-06-20', status: 'ongoing', img: 'https://picsum.photos/seed/math-textbook/120/120' },
-  { title: '全新计算器 fx-991CNX', price: 120, date: '2026-06-18', status: 'ongoing', img: 'https://picsum.photos/seed/calculator/120/120' },
-  { title: '宿舍用小冰箱 便携', price: 80, date: '2026-06-15', status: 'completed', img: 'https://picsum.photos/seed/mini-fridge/120/120' },
-  { title: '大学物理笔记 手写', price: 15, date: '2026-06-10', status: 'closed', img: 'https://picsum.photos/seed/physics-notes/120/120' },
-  { title: '篮球 斯伯丁正品', price: 55, date: '2026-06-08', status: 'ongoing', img: 'https://picsum.photos/seed/basketball/120/120' },
-])
+}))
 
 const myFavorites = ref([
   { title: '机械键盘 青轴', price: 89, img: 'https://picsum.photos/seed/keyboard/120/120' },

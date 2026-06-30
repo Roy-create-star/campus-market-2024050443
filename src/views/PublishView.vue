@@ -1,463 +1,407 @@
+<template>
+  <section class="page">
+    <div class="page-header">
+      <h1>发布信息</h1>
+      <p>选择发布类型，填写必要信息，让校园需求更快被看见。</p>
+    </div>
+
+    <form class="publish-form" @submit.prevent="handleSubmit">
+      <FormField label="发布类型" required>
+        <select v-model="publishType">
+          <option value="trade">二手交易</option>
+          <option value="lostFound">失物招领</option>
+          <option value="groupBuy">拼单搭子</option>
+          <option value="errand">跑腿委托</option>
+        </select>
+      </FormField>
+
+      <FormField label="标题" required :error="errors.title">
+        <input v-model.trim="form.title" type="text" placeholder="请输入标题" />
+      </FormField>
+
+      <FormField label="地点" required :error="errors.location">
+        <input v-model.trim="form.location" type="text" placeholder="请输入地点" />
+      </FormField>
+
+      <FormField label="描述" required :error="errors.description">
+        <textarea v-model.trim="form.description" rows="5" placeholder="请简要描述具体情况"></textarea>
+      </FormField>
+
+      <template v-if="publishType === 'trade'">
+        <FormField label="商品分类" required :error="errors.category">
+          <input v-model.trim="form.category" type="text" placeholder="如：数码配件、教材资料、生活用品" />
+        </FormField>
+
+        <FormField label="价格" required :error="errors.price">
+          <input v-model.number="form.price" type="number" min="0" placeholder="请输入价格" />
+        </FormField>
+
+        <FormField label="成色" required :error="errors.condition">
+          <select v-model="form.condition">
+            <option value="">请选择成色</option>
+            <option value="全新">全新</option>
+            <option value="九成新">九成新</option>
+            <option value="八成新">八成新</option>
+            <option value="正常使用痕迹">正常使用痕迹</option>
+          </select>
+        </FormField>
+      </template>
+
+      <template v-if="publishType === 'lostFound'">
+        <FormField label="信息类型" required>
+          <select v-model="form.lostFoundType">
+            <option value="lost">寻物</option>
+            <option value="found">招领</option>
+          </select>
+        </FormField>
+
+        <FormField label="物品名称" required :error="errors.itemName">
+          <input v-model.trim="form.itemName" type="text" placeholder="请输入物品名称" />
+        </FormField>
+
+        <FormField label="发生时间" required :error="errors.eventTime">
+          <input v-model="form.eventTime" type="datetime-local" />
+        </FormField>
+      </template>
+
+      <template v-if="publishType === 'groupBuy'">
+        <FormField label="拼单类型" required :error="errors.groupType">
+          <input v-model.trim="form.groupType" type="text" placeholder="如：拼餐、资料团购、运动搭子" />
+        </FormField>
+
+        <FormField label="目标人数" required :error="errors.targetCount">
+          <input v-model.number="form.targetCount" type="number" min="2" placeholder="请输入目标人数" />
+        </FormField>
+
+        <FormField label="截止时间" required :error="errors.deadline">
+          <input v-model="form.deadline" type="datetime-local" />
+        </FormField>
+      </template>
+
+      <template v-if="publishType === 'errand'">
+        <FormField label="任务类型" required :error="errors.taskType">
+          <input v-model.trim="form.taskType" type="text" placeholder="如：取快递、代买、代送" />
+        </FormField>
+
+        <FormField label="酬劳" required :error="errors.reward">
+          <input v-model.number="form.reward" type="number" min="0" placeholder="请输入酬劳" />
+        </FormField>
+
+        <FormField label="取件地点" required :error="errors.from">
+          <input v-model.trim="form.from" type="text" placeholder="请输入取件地点" />
+        </FormField>
+
+        <FormField label="送达地点" required :error="errors.to">
+          <input v-model.trim="form.to" type="text" placeholder="请输入送达地点" />
+        </FormField>
+
+        <FormField label="截止时间" required :error="errors.deadline">
+          <input v-model="form.deadline" type="datetime-local" />
+        </FormField>
+      </template>
+
+      <div class="actions">
+        <button type="button" class="secondary" @click="resetForm">重置</button>
+        <button type="submit" class="primary" :disabled="submitting">
+          {{ submitting ? '提交中...' : '发布' }}
+        </button>
+      </div>
+    </form>
+  </section>
+</template>
+
 <script setup lang="ts">
-import { ref, reactive } from 'vue'
+import { reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { ElMessage } from 'element-plus'
-import {
-  ElButton, ElInput, ElSelect, ElOption,
-  ElForm, ElFormItem,
-  ElUpload, ElDatePicker, ElInputNumber,
-  ElTabs, ElTabPane,
-  ElIcon, ElRadioGroup, ElRadioButton,
-  ElAlert
-} from 'element-plus'
-import { Plus } from '@element-plus/icons-vue'
+
+import FormField from '../components/FormField.vue'
+import { createTrade } from '../api/trade'
+import { createLostFound } from '../api/lostFound'
+import { createGroupBuy } from '../api/groupBuy'
+import { createErrand } from '../api/errand'
+
+type PublishType = 'trade' | 'lostFound' | 'groupBuy' | 'errand'
 
 const router = useRouter()
-const activeTab = ref('second-hand')
+const publishType = ref<PublishType>('trade')
+const submitting = ref(false)
 
-function goBack() {
-  router.push('/')
-}
-
-const secondHandForm = reactive({
+const form = reactive({
   title: '',
-  campus: '',
   location: '',
   description: '',
+  category: '',
   price: 0,
-  condition: 5,
-  tags: '',
-  images: [] as string[]
-})
-
-const lostForm = reactive({
-  title: '',
-  type: 'lost',
-  campus: '',
-  location: '',
-  description: '',
-  happenTime: '',
-  features: '',
-  contact: ''
-})
-
-const groupForm = reactive({
-  title: '',
-  campus: '',
-  location: '',
-  description: '',
+  condition: '',
+  lostFoundType: 'lost',
+  itemName: '',
+  eventTime: '',
+  groupType: '',
   targetCount: 2,
   deadline: '',
-  contact: ''
-})
-
-const errandForm = reactive({
-  title: '',
-  campus: '',
-  location: '',
-  description: '',
+  taskType: '',
   reward: 0,
-  completionTime: '',
-  contact: ''
+  from: '',
+  to: '',
 })
 
-const uploadedPreviews = ref([
-  { id: 1, gradient: 'linear-gradient(135deg, #f5d0b0, #FFE8D6, #fff9f3)', label: '商品图1' },
-  { id: 2, gradient: 'linear-gradient(135deg, #e8dcc8, #f0e8d8, #fff9f3)', label: '商品图2' }
-])
+const errors = reactive<Record<string, string>>({})
 
-function handleUpload() {
-  ElMessage.info('模拟：打开文件选择器上传图片')
+function clearErrors() {
+  Object.keys(errors).forEach((key) => {
+    errors[key] = ''
+  })
 }
 
-function removePreview(id: number) {
-  uploadedPreviews.value = uploadedPreviews.value.filter(p => p.id !== id)
-  ElMessage.success('已移除图片')
+function validateForm() {
+  clearErrors()
+
+  if (!form.title) {
+    errors.title = '请输入标题'
+  }
+
+  if (!form.location) {
+    errors.location = '请输入地点'
+  }
+
+  if (!form.description) {
+    errors.description = '请输入描述'
+  }
+
+  if (publishType.value === 'trade') {
+    if (!form.category) {
+      errors.category = '请输入商品分类'
+    }
+    if (form.price <= 0) {
+      errors.price = '价格应大于 0'
+    }
+    if (!form.condition) {
+      errors.condition = '请选择商品成色'
+    }
+  }
+
+  if (publishType.value === 'lostFound') {
+    if (!form.itemName) {
+      errors.itemName = '请输入物品名称'
+    }
+    if (!form.eventTime) {
+      errors.eventTime = '请选择发生时间'
+    }
+  }
+
+  if (publishType.value === 'groupBuy') {
+    if (!form.groupType) {
+      errors.groupType = '请输入拼单类型'
+    }
+    if (form.targetCount < 2) {
+      errors.targetCount = '目标人数不能少于 2 人'
+    }
+    if (!form.deadline) {
+      errors.deadline = '请选择截止时间'
+    }
+  }
+
+  if (publishType.value === 'errand') {
+    if (!form.taskType) {
+      errors.taskType = '请输入任务类型'
+    }
+    if (form.reward < 0) {
+      errors.reward = '酬劳不能为负数'
+    }
+    if (!form.from) {
+      errors.from = '请输入取件地点'
+    }
+    if (!form.to) {
+      errors.to = '请输入送达地点'
+    }
+    if (!form.deadline) {
+      errors.deadline = '请选择截止时间'
+    }
+  }
+
+  return Object.values(errors).every((message) => !message)
 }
 
-function handleSubmit() {
-  ElMessage.success('发布成功！')
+function resetForm() {
+  form.title = ''
+  form.location = ''
+  form.description = ''
+  form.category = ''
+  form.price = 0
+  form.condition = ''
+  form.lostFoundType = 'lost'
+  form.itemName = ''
+  form.eventTime = ''
+  form.groupType = ''
+  form.targetCount = 2
+  form.deadline = ''
+  form.taskType = ''
+  form.reward = 0
+  form.from = ''
+  form.to = ''
+
+  clearErrors()
 }
 
-function handleReset() {
-  Object.assign(secondHandForm, {
-    title: '', campus: '', location: '', description: '',
-    price: 0, condition: 5, tags: '', images: []
-  })
-  Object.assign(lostForm, {
-    title: '', type: 'lost', campus: '', location: '', description: '',
-    happenTime: '', features: '', contact: ''
-  })
-  Object.assign(groupForm, {
-    title: '', campus: '', location: '', description: '',
-    targetCount: 2, deadline: '', contact: ''
-  })
-  Object.assign(errandForm, {
-    title: '', campus: '', location: '', description: '',
-    reward: 0, completionTime: '', contact: ''
-  })
-  ElMessage.success('所有表单已重置')
+function getCurrentTime() {
+  const now = new Date()
+  return now.toISOString().slice(0, 16).replace('T', ' ')
+}
+
+async function handleSubmit() {
+  if (!validateForm()) {
+    return
+  }
+
+  submitting.value = true
+
+  try {
+    if (publishType.value === 'trade') {
+      await createTrade({
+        title: form.title,
+        category: form.category,
+        price: form.price,
+        condition: form.condition,
+        location: form.location,
+        publisher: '当前用户',
+        publishTime: getCurrentTime(),
+        image: '',
+        status: 'open',
+        description: form.description,
+      })
+
+      window.alert('二手商品发布成功')
+      router.push('/trade')
+    }
+
+    if (publishType.value === 'lostFound') {
+      await createLostFound({
+        title: form.title,
+        type: form.lostFoundType as 'lost' | 'found',
+        itemName: form.itemName,
+        location: form.location,
+        eventTime: form.eventTime,
+        contact: '站内消息联系',
+        status: 'open',
+        description: form.description,
+      })
+
+      window.alert('失物招领信息发布成功')
+      router.push('/lost-found')
+    }
+
+    if (publishType.value === 'groupBuy') {
+      await createGroupBuy({
+        title: form.title,
+        type: form.groupType,
+        targetCount: form.targetCount,
+        currentCount: 1,
+        deadline: form.deadline,
+        location: form.location,
+        publisher: '当前用户',
+        status: 'open',
+        description: form.description,
+      })
+
+      window.alert('拼单搭子信息发布成功')
+      router.push('/group-buy')
+    }
+
+    if (publishType.value === 'errand') {
+      await createErrand({
+        title: form.title,
+        taskType: form.taskType,
+        reward: form.reward,
+        from: form.from,
+        to: form.to,
+        deadline: form.deadline,
+        publisher: '当前用户',
+        status: 'open',
+        description: form.description,
+      })
+
+      window.alert('跑腿委托发布成功')
+      router.push('/errand')
+    }
+  } catch (error) {
+    console.error(error)
+    window.alert('发布失败，请检查 Mock 服务是否正常运行')
+  } finally {
+    submitting.value = false
+  }
 }
 </script>
 
-<template>
-  <div class="page-container">
-    <div class="top-bar">
-      <span class="back-btn" @click="goBack">&lt;</span>
-      <span>发布信息</span>
-    </div>
-
-    <div class="content-area">
-      <div class="form-card">
-        <ElTabs v-model="activeTab" class="publish-tabs" :stretch="true">
-          <ElTabPane label="二手交易" name="second-hand">
-            <ElForm label-position="top" :model="secondHandForm" class="publish-form">
-              <ElFormItem label="标题">
-                <template #label><span>标题<span class="required-star">*</span></span></template>
-                <ElInput v-model="secondHandForm.title" placeholder="请输入商品标题" />
-              </ElFormItem>
-              <ElFormItem label="所属校区">
-                <ElSelect v-model="secondHandForm.campus" placeholder="请选择校区">
-                  <ElOption label="校本部" value="main" />
-                  <ElOption label="东校区" value="east" />
-                  <ElOption label="西校区" value="west" />
-                  <ElOption label="南校区" value="south" />
-                </ElSelect>
-              </ElFormItem>
-              <ElFormItem label="交易地点">
-                <ElInput v-model="secondHandForm.location" placeholder="如：图书馆一楼大厅" />
-              </ElFormItem>
-              <ElFormItem label="商品描述">
-                <ElInput v-model="secondHandForm.description" type="textarea" :rows="4" placeholder="请详细描述商品信息、使用情况等" />
-              </ElFormItem>
-              <ElFormItem label="价格（元）">
-                <ElInputNumber v-model="secondHandForm.price" :min="0" :precision="2" style="width:200px;" />
-              </ElFormItem>
-              <ElFormItem label="成色评分（1-10）">
-                <ElInputNumber v-model="secondHandForm.condition" :min="1" :max="10" style="width:200px;" />
-                <div class="form-hint">1 = 较差, 10 = 全新</div>
-              </ElFormItem>
-              <ElFormItem label="标签">
-                <ElInput v-model="secondHandForm.tags" placeholder="如：教材, 九成新, 可议价（用逗号分隔）" />
-              </ElFormItem>
-              <ElFormItem label="上传图片">
-                <div class="upload-area" @click="handleUpload">
-                  <div class="upload-icon">
-                    <div class="upload-plus-icon" style="background: linear-gradient(135deg, #f5d0b0, #FFE8D6);">+</div>
-                  </div>
-                  <div>点击或拖拽上传图片</div>
-                  <div class="upload-tip">支持 JPG/PNG，最多 6 张</div>
-                </div>
-                <div class="preview-list">
-                  <div
-                    v-for="item in uploadedPreviews"
-                    :key="item.id"
-                    class="preview-item"
-                    :style="{ background: item.gradient }"
-                    @click="removePreview(item.id)"
-                    :title="'点击移除' + item.label"
-                  >
-                    <span class="preview-label">{{ item.label }}</span>
-                  </div>
-                </div>
-              </ElFormItem>
-            </ElForm>
-          </ElTabPane>
-
-          <ElTabPane label="失物招领" name="lost-found">
-            <ElForm label-position="top" :model="lostForm" class="publish-form">
-              <ElFormItem label="类型">
-                <ElRadioGroup v-model="lostForm.type">
-                  <ElRadioButton value="lost">寻物启事</ElRadioButton>
-                  <ElRadioButton value="found">失物招领</ElRadioButton>
-                </ElRadioGroup>
-              </ElFormItem>
-              <ElFormItem label="标题">
-                <template #label><span>标题<span class="required-star">*</span></span></template>
-                <ElInput v-model="lostForm.title" placeholder="如：寻找黑色钱包 / 拾获学生卡一张" />
-              </ElFormItem>
-              <ElFormItem label="所属校区">
-                <ElSelect v-model="lostForm.campus" placeholder="请选择校区">
-                  <ElOption label="校本部" value="main" />
-                  <ElOption label="东校区" value="east" />
-                  <ElOption label="西校区" value="west" />
-                  <ElOption label="南校区" value="south" />
-                </ElSelect>
-              </ElFormItem>
-              <ElFormItem label="地点">
-                <ElInput v-model="lostForm.location" placeholder="丢失/拾获的具体位置" />
-              </ElFormItem>
-              <ElFormItem label="发生时间">
-                <ElDatePicker v-model="lostForm.happenTime" type="datetime" placeholder="选择时间" style="width:100%;" />
-              </ElFormItem>
-              <ElFormItem label="特征描述">
-                <ElInput v-model="lostForm.features" type="textarea" :rows="3" placeholder="物品的颜色、品牌、型号等特征" />
-              </ElFormItem>
-              <ElFormItem label="详细描述">
-                <ElInput v-model="lostForm.description" type="textarea" :rows="3" placeholder="补充说明" />
-              </ElFormItem>
-              <ElFormItem label="联系方式">
-                <ElInput v-model="lostForm.contact" placeholder="手机号 / 微信 / QQ" />
-              </ElFormItem>
-            </ElForm>
-          </ElTabPane>
-
-          <ElTabPane label="拼单搭子" name="group-order">
-            <ElForm label-position="top" :model="groupForm" class="publish-form">
-              <ElFormItem label="标题">
-                <template #label><span>标题<span class="required-star">*</span></span></template>
-                <ElInput v-model="groupForm.title" placeholder="如：奶茶第二杯半价求拼" />
-              </ElFormItem>
-              <ElFormItem label="所属校区">
-                <ElSelect v-model="groupForm.campus" placeholder="请选择校区">
-                  <ElOption label="校本部" value="main" />
-                  <ElOption label="东校区" value="east" />
-                  <ElOption label="西校区" value="west" />
-                  <ElOption label="南校区" value="south" />
-                </ElSelect>
-              </ElFormItem>
-              <ElFormItem label="地点">
-                <ElInput v-model="groupForm.location" placeholder="交易/自取地点" />
-              </ElFormItem>
-              <ElFormItem label="目标人数">
-                <ElInputNumber v-model="groupForm.targetCount" :min="2" :max="50" style="width:200px;" />
-                <div class="form-hint">达到此人数后自动成团</div>
-              </ElFormItem>
-              <ElFormItem label="截止时间">
-                <ElDatePicker v-model="groupForm.deadline" type="datetime" placeholder="选择截止时间" style="width:100%;" />
-              </ElFormItem>
-              <ElFormItem label="详细描述">
-                <ElInput v-model="groupForm.description" type="textarea" :rows="4" placeholder="描述拼单内容、价格分摊方式等" />
-              </ElFormItem>
-              <ElFormItem label="联系方式">
-                <ElInput v-model="groupForm.contact" placeholder="手机号 / 微信 / QQ" />
-              </ElFormItem>
-            </ElForm>
-          </ElTabPane>
-
-          <ElTabPane label="跑腿委托" name="errand">
-            <ElForm label-position="top" :model="errandForm" class="publish-form">
-              <ElFormItem label="标题">
-                <template #label><span>标题<span class="required-star">*</span></span></template>
-                <ElInput v-model="errandForm.title" placeholder="如：代取韵达快递到海韵公寓" />
-              </ElFormItem>
-              <ElFormItem label="所属校区">
-                <ElSelect v-model="errandForm.campus" placeholder="请选择校区">
-                  <ElOption label="校本部" value="main" />
-                  <ElOption label="东校区" value="east" />
-                  <ElOption label="西校区" value="west" />
-                  <ElOption label="南校区" value="south" />
-                </ElSelect>
-              </ElFormItem>
-              <ElFormItem label="地点">
-                <ElInput v-model="errandForm.location" placeholder="取件/办事地点" />
-              </ElFormItem>
-              <ElFormItem label="报酬（元）">
-                <ElInputNumber v-model="errandForm.reward" :min="0" :precision="2" style="width:200px;" />
-              </ElFormItem>
-              <ElFormItem label="完成时限">
-                <ElDatePicker v-model="errandForm.completionTime" type="datetime" placeholder="期望完成时间" style="width:100%;" />
-              </ElFormItem>
-              <ElFormItem label="详细描述">
-                <ElInput v-model="errandForm.description" type="textarea" :rows="4" placeholder="跑腿任务的具体要求、取件码、联系人等" />
-              </ElFormItem>
-              <ElFormItem label="联系方式">
-                <ElInput v-model="errandForm.contact" placeholder="手机号 / 微信 / QQ" />
-              </ElFormItem>
-            </ElForm>
-          </ElTabPane>
-        </ElTabs>
-
-        <div class="btn-group">
-          <button class="btn-submit" @click="handleSubmit">提交发布</button>
-          <button class="btn-reset" @click="handleReset">重置</button>
-        </div>
-      </div>
-    </div>
-  </div>
-</template>
-
 <style scoped>
-:root {
-  --main: #FFE8D6;
-  --secondary: #FFF9F3;
-  --text-primary: #333;
-  --text-secondary: #666;
-}
-
-.page-container {
-  width: 100%;
-}
-
-.top-bar {
-  background: var(--main);
-  padding: 16px 48px;
+.page {
   display: flex;
-  align-items: center;
-  gap: 16px;
-  font-size: 18px;
-  font-weight: 600;
+  flex-direction: column;
+  gap: 20px;
 }
 
-.back-btn {
-  font-size: 22px;
-  cursor: pointer;
-  text-decoration: none;
-  color: inherit;
-  line-height: 1;
-}
-
-.content-area {
-  padding: 40px 80px;
-}
-
-.form-card {
+.page-header {
+  padding: 24px;
+  border-radius: 16px;
   background: #fff;
-  border: 2px solid var(--main);
-  border-radius: 20px;
-  padding: 48px 56px;
-  max-width: 800px;
-  margin: 0 auto;
 }
 
-.publish-tabs {
-  margin-bottom: 8px;
+.page-header h1 {
+  margin: 0 0 8px;
+}
+
+.page-header p {
+  margin: 0;
+  color: #6b7280;
 }
 
 .publish-form {
-  margin-top: 24px;
+  display: grid;
+  gap: 18px;
+  padding: 24px;
+  border-radius: 16px;
+  background: #fff;
 }
 
-.publish-form .el-form-item {
-  margin-bottom: 24px;
-}
-
-:deep(.el-form-item__label) {
-  font-weight: 500;
-}
-
-.required-star {
-  color: #f56c6c;
-  margin-left: 2px;
-}
-
-.form-hint {
-  color: var(--text-secondary);
-  font-size: 12px;
-  margin-top: 4px;
-}
-
-.upload-area {
-  border: 2px dashed #ddd;
-  border-radius: 12px;
-  padding: 32px;
-  text-align: center;
-  color: var(--text-secondary);
-  font-size: 14px;
-  cursor: pointer;
-  transition: border-color 0.2s;
+input,
+select,
+textarea {
   width: 100%;
-}
-
-.upload-area:hover {
-  border-color: var(--main);
-}
-
-.upload-icon {
-  margin-bottom: 8px;
-  display: flex;
-  justify-content: center;
-}
-
-.upload-plus-icon {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 24px;
-  font-weight: 700;
-  color: #7a6a5a;
-}
-
-.upload-tip {
-  font-size: 12px;
-  margin-top: 4px;
-}
-
-.preview-list {
-  display: flex;
-  gap: 12px;
-  margin-top: 12px;
-  flex-wrap: wrap;
-}
-
-.preview-item {
-  width: 80px;
-  height: 80px;
+  box-sizing: border-box;
+  border: 1px solid #d1d5db;
   border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 11px;
-  font-weight: 600;
-  color: #5a4a3a;
-  border: 1px solid #e0d0c0;
-  cursor: pointer;
-  transition: opacity 0.2s;
+  padding: 10px 12px;
+  font-size: 14px;
 }
 
-.preview-item:hover {
+textarea {
+  resize: vertical;
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+button {
+  border: none;
+  border-radius: 8px;
+  padding: 10px 18px;
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: not-allowed;
   opacity: 0.7;
 }
 
-.preview-label {
-  background: rgba(255,255,255,0.7);
-  padding: 2px 6px;
-  border-radius: 4px;
+.primary {
+  background: #2563eb;
+  color: #fff;
 }
 
-.btn-group {
-  display: flex;
-  gap: 20px;
-  justify-content: center;
-  margin-top: 40px;
-}
-
-.btn-submit {
-  background: linear-gradient(135deg, #FFE8D6, #f5d0b0);
-  border: none;
-  color: var(--text-primary);
-  font-weight: 600;
-  padding: 12px 48px;
-  border-radius: 12px;
-  font-size: 16px;
-  cursor: pointer;
-  transition: opacity 0.2s;
-  font-family: inherit;
-}
-
-.btn-submit:hover { opacity: 0.85; }
-
-.btn-reset {
-  background: #e0e0e0;
-  border: none;
-  color: var(--text-secondary);
-  font-weight: 500;
-  padding: 12px 32px;
-  border-radius: 12px;
-  font-size: 16px;
-  cursor: pointer;
-  transition: background 0.2s;
-  font-family: inherit;
-}
-
-.btn-reset:hover { background: #d0d0d0; }
-
-@media (max-width: 768px) {
-  .top-bar { padding: 16px; }
-  .content-area { padding: 24px 16px; }
-  .form-card { padding: 24px 20px; }
+.secondary {
+  background: #f3f4f6;
+  color: #374151;
 }
 </style>

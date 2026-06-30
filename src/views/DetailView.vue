@@ -1,11 +1,29 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ElTag, ElInput, ElButton, ElMessage, ElCarousel, ElCarouselItem, ElIcon } from 'element-plus'
+import { getTradeById, type TradeItem } from '../api/trade'
+import { getLostFoundById, type LostFoundItem } from '../api/lostFound'
+import { getGroupBuyById, type GroupBuyItem } from '../api/groupBuy'
+import { getErrandById, type ErrandItem } from '../api/errand'
 
 const route = useRoute()
 const router = useRouter()
 const offerPrice = ref('')
+
+const item = ref<{
+  title: string
+  price: string
+  originalPrice: string
+  description: string
+  seller: string
+  sellerAvatar: string
+  tags: string[]
+  type: string
+  imageSeed: string
+  condition?: string
+  status?: string
+} | null>(null)
 
 function goBack() {
   router.back()
@@ -19,172 +37,77 @@ function sendOffer() {
   ElMessage.success(`已向发布者发送 ¥${offerPrice.value} 的出价请求`)
 }
 
-interface MockItem {
-  title: string
-  price: string
-  originalPrice: string
-  description: string
-  seller: string
-  sellerAvatar: string
-  tags: string[]
-  type: string
-  imageSeed: string
-  condition?: string
-  status?: string
-}
+onMounted(async () => {
+  const id = Number(route.params.id)
+  const type = (route.query.type as string) || 'trade'
 
-const mockItems: Record<string, MockItem> = {
-  '1': {
-    title: 'MacBook Air M2 2023款',
-    price: '¥6,500.00',
-    originalPrice: '¥8,999.00',
-    description: '2023款MacBook Air M2芯片，8GB+256GB，银色外观完好，电池循环仅58次。因升级设备转让，附原装充电器。东区食堂当面验货。',
-    seller: '校园小达人',
-    sellerAvatar: 'xiaoda',
-    tags: ['笔记本', '苹果', 'MacBook', '二手'],
-    type: '二手',
-    imageSeed: 'macbook',
-    condition: '九成新',
-    status: '在售'
-  },
-  '2': {
-    title: '捡到学生证 - 李明',
-    price: '',
-    originalPrice: '',
-    description: '在图书馆二楼自习区捡到学生证一张，姓名李明，学号202401234。请失主联系认领，到图书馆服务台即可。',
-    seller: '热心同学',
-    sellerAvatar: 'rexin',
-    tags: ['失物招领', '学生证', '图书馆'],
-    type: '失物',
-    imageSeed: 'student-id',
-    status: '待认领'
-  },
-  '3': {
-    title: '喜茶多肉葡萄拼单',
-    price: '',
-    originalPrice: '',
-    description: '喜茶多肉葡萄买一送一活动，一起拼单更划算！北门喜茶店集合，下午4点前下单。目前已有3人，再凑2人满5人可享团购价。',
-    seller: '奶茶达人',
-    sellerAvatar: 'naicha',
-    tags: ['拼单', '喜茶', '多肉葡萄', '团购'],
-    type: '拼单',
-    imageSeed: 'tea',
-    status: '拼单中'
-  },
-  '4': {
-    title: '代取中通/圆通快递',
-    price: '¥8.00',
-    originalPrice: '',
-    description: '每天下午5-6点去菜鸟驿站，可以帮带快递到东区宿舍。中通/圆通均可，大件另议。当天送达，安全可靠。',
-    seller: '跑腿小王',
-    sellerAvatar: 'paotui',
-    tags: ['跑腿', '快递', '代取', '中通', '圆通'],
-    type: '跑腿',
-    imageSeed: 'package',
-    status: '进行中'
-  },
-  '5': {
-    title: '全新高等数学第七版',
-    price: '¥28.00',
-    originalPrice: '¥48.00',
-    description: '全新高等数学第七版上册，买来后几乎没翻过，适合大一新生。西区超市旁面交，可小刀。',
-    seller: '学霸学长',
-    sellerAvatar: 'xueba',
-    tags: ['教材', '高数', '高等数学', '全新'],
-    type: '二手',
-    imageSeed: 'math-book',
-    condition: '全新',
-    status: '在售'
-  },
-  '6': {
-    title: '蓝色水杯（南教203捡到）',
-    price: '',
-    originalPrice: '',
-    description: '在南教203教室捡到蓝色水杯一个，杯身有"Keep"字样。请失主到南教一楼失物招领处认领。',
-    seller: '保洁阿姨',
-    sellerAvatar: 'ayi',
-    tags: ['失物招领', '水杯', '南教'],
-    type: '失物',
-    imageSeed: 'cup',
-    status: '待认领'
-  },
-  '7': {
-    title: '周末羽毛球拼单',
-    price: '',
-    originalPrice: '',
-    description: '周末体育馆羽毛球场已预约，缺2人拼单。每人AA场地费15元，自带球拍，球我来提供。欢迎高手新手一起玩！',
-    seller: '运动达人',
-    sellerAvatar: 'sport',
-    tags: ['拼单', '羽毛球', '运动', '周末'],
-    type: '拼单',
-    imageSeed: 'badminton',
-    status: '拼单中'
-  },
-  '8': {
-    title: '代取外卖送到宿舍',
-    price: '¥3.00',
-    originalPrice: '',
-    description: '北门外卖柜代取送到宿舍楼下，每单3元。高峰期11:30-12:30接单，下单后30分钟内送达。',
-    seller: '跑腿小王',
-    sellerAvatar: 'paotui',
-    tags: ['跑腿', '外卖', '代取', '送餐'],
-    type: '跑腿',
-    imageSeed: 'food',
-    status: '进行中'
-  },
-  '9': {
-    title: '雅思词汇书（9成新）',
-    price: '¥15.00',
-    originalPrice: '¥39.00',
-    description: '雅思词汇书（乱序版），9成新，内页干净无涂写。附赠雅思备考资料电子版。东校区面交。',
-    seller: '校园小达人',
-    sellerAvatar: 'xiaoda',
-    tags: ['教材', '雅思', '词汇书', '英语'],
-    type: '二手',
-    imageSeed: 'ielts',
-    condition: '九成新',
-    status: '在售'
-  },
-  '10': {
-    title: '自行车钥匙（钥匙串）',
-    price: '',
-    originalPrice: '',
-    description: '在东区停车场捡到自行车钥匙一把（带红色钥匙串）。失主请到东区保安室认领。',
-    seller: '保安大叔',
-    sellerAvatar: 'security',
-    tags: ['失物招领', '钥匙', '自行车'],
-    type: '失物',
-    imageSeed: 'key',
-    status: '待认领'
-  },
-  '11': {
-    title: '咖啡拼单（瑞幸9.9）',
-    price: '',
-    originalPrice: '',
-    description: '瑞幸9.9元咖啡拼单！校内瑞幸店自取，目前1人，还差2人成团。生椰拿铁/标准美式均可，下午2点前下单。',
-    seller: '咖啡达人',
-    sellerAvatar: 'coffee',
-    tags: ['拼单', '咖啡', '瑞幸', '9.9'],
-    type: '拼单',
-    imageSeed: 'coffee',
-    status: '拼单中'
-  },
-  '12': {
-    title: '代取京东/顺丰大件',
-    price: '¥10.00',
-    originalPrice: '',
-    description: '专业代取京东/顺丰大件快递，可帮忙搬上宿舍。菜鸟驿站→西区宿舍，每单10元，大件家电/箱子均可。',
-    seller: '跑腿小王',
-    sellerAvatar: 'paotui',
-    tags: ['跑腿', '京东', '顺丰', '大件'],
-    type: '跑腿',
-    imageSeed: 'delivery',
-    status: '进行中'
+  try {
+    if (type === 'trade') {
+      const res = await getTradeById(id)
+      const data = res.data
+      item.value = {
+        title: data.title,
+        price: '¥' + data.price.toFixed(2),
+        originalPrice: '',
+        description: data.description,
+        seller: data.publisher,
+        sellerAvatar: 'avatar',
+        tags: [data.category, data.condition, data.status],
+        type: '二手',
+        imageSeed: 'detail-trade-' + data.id,
+        condition: data.condition,
+        status: data.status === 'open' ? '在售' : '已关闭',
+      }
+    } else if (type === 'lostFound') {
+      const res = await getLostFoundById(id)
+      const data = res.data
+      item.value = {
+        title: data.title,
+        price: '',
+        originalPrice: '',
+        description: data.description,
+        seller: data.contact,
+        sellerAvatar: 'avatar',
+        tags: [data.type === 'lost' ? '寻物' : '招领', data.itemName],
+        type: '失物',
+        imageSeed: 'detail-lost-' + data.id,
+        status: data.status === 'open' ? '待认领' : '已找回',
+      }
+    } else if (type === 'groupBuy') {
+      const res = await getGroupBuyById(id)
+      const data = res.data
+      item.value = {
+        title: data.title,
+        price: '',
+        originalPrice: '',
+        description: data.description,
+        seller: data.publisher,
+        sellerAvatar: 'avatar',
+        tags: [data.type, data.status],
+        type: '拼单',
+        imageSeed: 'detail-group-' + data.id,
+        status: data.status === 'open' ? '拼单中' : '已结束',
+      }
+    } else if (type === 'errand') {
+      const res = await getErrandById(id)
+      const data = res.data
+      item.value = {
+        title: data.title,
+        price: '¥' + data.reward.toFixed(2),
+        originalPrice: '',
+        description: data.description,
+        seller: data.publisher,
+        sellerAvatar: 'avatar',
+        tags: [data.taskType, data.status],
+        type: '跑腿',
+        imageSeed: 'detail-errand-' + data.id,
+        status: data.status === 'open' ? '进行中' : '已完成',
+      }
+    }
+  } catch {
+    ElMessage.error('未找到该物品')
   }
-}
-
-const itemId = route.params.id as string
-const item = computed(() => mockItems[itemId] || mockItems['1']!)
+})
 </script>
 
 <template>
@@ -192,6 +115,9 @@ const item = computed(() => mockItems[itemId] || mockItems['1']!)
     <div class="detail-top-bar">
       <span class="back-btn" @click="goBack">← 返回</span>
     </div>
+    <div v-if="!item" class="loading-state">加载中...</div>
+
+    <template v-else>
     <div class="detail-layout">
       <div class="image-section">
         <ElCarousel height="420px" trigger="click" indicator-position="none" arrow="always" :interval="3000">
@@ -262,6 +188,7 @@ const item = computed(() => mockItems[itemId] || mockItems['1']!)
         </div>
       </div>
     </div>
+    </template>
   </div>
 </template>
 
@@ -335,4 +262,5 @@ const item = computed(() => mockItems[itemId] || mockItems['1']!)
 .offer-btn { background: #FFE8D6; color: #333; border: none; }
 .security-card { background: #fef8f0; border-left: 4px solid #f90; padding: 12px 16px; border-radius: 8px; font-size: 13px; color: #666; }
 .security-title { font-weight: 500; font-size: 14px; margin-bottom: 4px; }
+.loading-state { text-align: center; padding: 80px 0; color: #999; font-size: 16px; }
 </style>

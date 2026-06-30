@@ -1,10 +1,14 @@
 <script setup lang="ts">
-import { ref, reactive, computed } from 'vue'
+import { ref, reactive, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import {
   ElCard, ElButton, ElTag, ElInput, ElSelect, ElOption,
   ElPagination, ElRow, ElCol, ElEmpty, ElCheckbox, ElProgress
 } from 'element-plus'
+import { getTrades, type TradeItem } from '../api/trade'
+import { getLostFounds, type LostFoundItem } from '../api/lostFound'
+import { getGroupBuys, type GroupBuyItem } from '../api/groupBuy'
+import { getErrands, type ErrandItem } from '../api/errand'
 
 const router = useRouter()
 
@@ -13,6 +17,7 @@ interface CardItem {
   title: string
   imgKey: string
   type: string
+  dataType: string
   price?: string
   reward?: string
   campus: string
@@ -77,20 +82,88 @@ const priceRange = reactive<PriceRange>({
   max: null
 })
 
-const cards = reactive<CardItem[]>([
-  { id: 1, title: 'MacBook Air M2 2023款', imgKey: 'macbook', type: '二手', price: '¥6,500', campus: '东校区', time: '10分钟前', statusType: 'success', statusText: '在售', liked: false, location: '东区食堂' },
-  { id: 2, title: '捡到学生证 - 李明', imgKey: 'student-id', type: '失物', campus: '图书馆二楼', time: '25分钟前', statusType: 'warning', statusText: '待认领', liked: false, foundDate: '2024-06-28', location: '图书馆' },
-  { id: 3, title: '喜茶多肉葡萄拼单', imgKey: 'tea', type: '拼单', campus: '北门喜茶店', time: '1小时前', statusType: 'primary', statusText: '拼单中', liked: true, current: 3, max: 5, location: '校门口' },
-  { id: 4, title: '代取中通/圆通快递', imgKey: 'package', type: '跑腿', campus: '菜鸟→东区宿舍', time: '45分钟前', statusType: 'success', statusText: '进行中', liked: false, reward: '¥8', location: '宿舍区' },
-  { id: 5, title: '全新高等数学第七版', imgKey: 'math-book', type: '二手', price: '¥28', campus: '西区超市', time: '2小时前', statusType: 'success', statusText: '在售', liked: true, location: '教学楼' },
-  { id: 6, title: '蓝色水杯（南教203捡到）', imgKey: 'cup', type: '失物', campus: '南教203教室', time: '3小时前', statusType: 'warning', statusText: '待认领', liked: false, foundDate: '2024-06-27', location: '教学楼' },
-  { id: 7, title: '周末羽毛球拼单', imgKey: 'badminton', type: '拼单', campus: '体育馆', time: '4小时前', statusType: 'primary', statusText: '拼单中', liked: false, current: 2, max: 4, location: '宿舍区' },
-  { id: 8, title: '代取外卖送到宿舍', imgKey: 'food', type: '跑腿', campus: '北门→东区宿舍', time: '2小时前', statusType: 'success', statusText: '进行中', liked: false, reward: '¥3', location: '校门口' },
-  { id: 9, title: '雅思词汇书（9成新）', imgKey: 'ielts', type: '二手', price: '¥15', campus: '东校区', time: '5小时前', statusType: 'success', statusText: '在售', liked: false, location: '东区食堂' },
-  { id: 10, title: '自行车钥匙（钥匙串）', imgKey: 'key', type: '失物', campus: '东区停车场', time: '6小时前', statusType: 'warning', statusText: '待认领', liked: false, foundDate: '2024-06-27', location: '宿舍区' },
-  { id: 11, title: '咖啡拼单（瑞幸9.9）', imgKey: 'coffee', type: '拼单', campus: '瑞幸咖啡（校内店）', time: '30分钟前', statusType: 'primary', statusText: '拼单中', liked: false, current: 1, max: 3, location: '食堂' },
-  { id: 12, title: '代取京东/顺丰大件', imgKey: 'delivery', type: '跑腿', campus: '菜鸟→西区宿舍', time: '1小时前', statusType: 'success', statusText: '进行中', liked: false, reward: '¥10', location: '宿舍区' }
-])
+const cards = reactive<CardItem[]>([])
+
+onMounted(async () => {
+  const [tradeRes, lostRes, groupRes, errandRes] = await Promise.all([
+    getTrades(),
+    getLostFounds(),
+    getGroupBuys(),
+    getErrands()
+  ])
+
+  const result: CardItem[] = []
+
+  tradeRes.data.forEach((item: TradeItem) => {
+    result.push({
+      id: item.id,
+      title: item.title,
+      imgKey: 'trade-' + item.id,
+      type: '二手',
+      dataType: 'trade',
+      campus: item.location,
+      time: item.publishTime,
+      statusType: item.status === 'open' ? 'success' : 'info',
+      statusText: item.status === 'open' ? '在售' : '已关闭',
+      liked: false,
+      location: item.location,
+    })
+  })
+
+  lostRes.data.forEach((item: LostFoundItem) => {
+    result.push({
+      id: item.id,
+      title: item.title,
+      imgKey: 'lost-' + item.id,
+      type: '失物',
+      dataType: 'lostFound',
+      campus: item.location,
+      time: item.eventTime,
+      statusType: 'warning',
+      statusText: item.status === 'open' ? '待认领' : '已找回',
+      liked: false,
+      foundDate: item.eventTime,
+      location: item.location,
+    })
+  })
+
+  groupRes.data.forEach((item: GroupBuyItem) => {
+    result.push({
+      id: item.id,
+      title: item.title,
+      imgKey: 'group-' + item.id,
+      type: '拼单',
+      dataType: 'groupBuy',
+      campus: item.location,
+      time: item.deadline,
+      statusType: 'primary',
+      statusText: item.status === 'open' ? '拼单中' : '已结束',
+      liked: false,
+      current: item.currentCount,
+      max: item.targetCount,
+      location: item.location,
+    })
+  })
+
+  errandRes.data.forEach((item: ErrandItem) => {
+    result.push({
+      id: item.id,
+      title: item.title,
+      imgKey: 'errand-' + item.id,
+      type: '跑腿',
+      dataType: 'errand',
+      reward: '¥' + item.reward,
+      campus: item.from + '→' + item.to,
+      time: item.deadline,
+      statusType: item.status === 'open' ? 'success' : 'info',
+      statusText: item.status === 'open' ? '进行中' : '已完成',
+      liked: false,
+      location: item.to,
+    })
+  })
+
+  cards.splice(0, cards.length, ...result)
+})
 
 const currentPage = ref(1)
 const pageSize = ref(12)
@@ -332,7 +405,7 @@ const getProgressPercent = (current?: number, max?: number): number => {
           <template v-if="viewMode === 'card'">
             <ElRow :gutter="20">
               <ElCol :span="8" v-for="card in paginatedCards" :key="card.id" class="card-col">
-                <ElCard shadow="never" class="card-cube" :body-style="{ padding: '0' }" @click="navTo('/detail/' + card.id)">
+                <ElCard shadow="never" class="card-cube" :body-style="{ padding: '0' }" @click="navTo('/detail/' + card.id + '?type=' + card.dataType)">
                   <div class="card-cube-img">
                     <img :src="'https://picsum.photos/seed/' + card.imgKey + '/400/300'" :alt="card.title" loading="lazy" />
                     <span class="card-cube-badge" :style="{ background: getTypeColor(card.type) }">{{ card.type }}</span>
@@ -365,7 +438,7 @@ const getProgressPercent = (current?: number, max?: number): number => {
 
           <template v-else>
             <div v-for="card in paginatedCards" :key="card.id" class="list-item-wrap">
-              <ElCard shadow="never" class="list-item" :body-style="{ padding: '14px 18px' }" @click="navTo('/detail/' + card.id)">
+              <ElCard shadow="never" class="list-item" :body-style="{ padding: '14px 18px' }" @click="navTo('/detail/' + card.id + '?type=' + card.dataType)">
                 <div class="list-row">
                   <div class="list-img">
                     <img :src="'https://picsum.photos/seed/' + card.imgKey + '/120/120'" :alt="card.title" loading="lazy" />
