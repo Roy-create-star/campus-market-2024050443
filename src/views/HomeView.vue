@@ -55,7 +55,7 @@ onMounted(async () => {
 
   tradeRes.data.slice(0, 3).forEach((item: TradeItem) => {
     all.push({
-      id: item.id,
+      id: item.id!,
       title: item.title,
       imgKey: 'home-trade-' + item.id,
       price: '¥' + item.price,
@@ -69,7 +69,7 @@ onMounted(async () => {
 
   lostRes.data.slice(0, 2).forEach((item: LostFoundItem) => {
     all.push({
-      id: item.id,
+      id: item.id!,
       title: item.title,
       imgKey: 'home-lost-' + item.id,
       price: '',
@@ -83,7 +83,7 @@ onMounted(async () => {
 
   groupRes.data.slice(0, 2).forEach((item: GroupBuyItem) => {
     all.push({
-      id: item.id,
+      id: item.id!,
       title: item.title,
       imgKey: 'home-group-' + item.id,
       price: '',
@@ -97,7 +97,7 @@ onMounted(async () => {
 
   errandRes.data.slice(0, 2).forEach((item: ErrandItem) => {
     all.push({
-      id: item.id,
+      id: item.id!,
       title: item.title,
       imgKey: 'home-errand-' + item.id,
       price: '¥' + item.reward,

@@ -1,6 +1,6 @@
 <template>
   <nav class="app-nav">
-    <RouterLink to="/" class="nav-link" active-class="active">首页</RouterLink>
+    <RouterLink to="/home" class="nav-link" active-class="active">首页</RouterLink>
     <RouterLink to="/list" class="nav-link" active-class="active">集市</RouterLink>
     <RouterLink to="/publish" class="nav-link" active-class="active">发布</RouterLink>
     <RouterLink to="/message" class="nav-link" active-class="active">消息</RouterLink>

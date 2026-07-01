@@ -1,26 +1,66 @@
 import { defineStore } from 'pinia'
-import { reactive, ref } from 'vue'
 
-export const useUserStore = defineStore('user', () => {
-  const profile = reactive({
-    nickname: '校园小达人',
-    studentId: '20240101001',
-    college: '计算机学院',
-    campus: '紫金港校区',
-    credit: 98,
-    phone: '',
-    bio: '',
-  })
+export interface CurrentUser {
+  id: number
+  name: string
+  college: string
+  grade: string
+  avatar: string
+  bio: string
+  studentId: string
+  phone: string
+}
 
-  const unreadTotal = ref(3)
+export const useUserStore = defineStore('user', {
+  state: () => ({
+    isLoggedIn: true,
+    unreadTotal: 0,
+    currentUser: {
+      id: 1,
+      name: '校园用户',
+      college: '计算机学院',
+      grade: '2023 级',
+      avatar: '',
+      bio: '热爱校园生活，喜欢分享闲置好物。',
+      studentId: '2023001',
+      phone: '138****0000',
+    },
+  }),
 
-  function updateProfile(data: Partial<typeof profile>) {
-    Object.assign(profile, data)
-  }
+  getters: {
+    displayName: (state) => state.currentUser.name,
+    userDescription: (state) => {
+      return `${state.currentUser.college} · ${state.currentUser.grade}`
+    },
+    profile: (state) => ({
+      nickname: state.currentUser.name,
+      campus: state.currentUser.college,
+      college: state.currentUser.college,
+      credit: 96,
+      studentId: state.currentUser.studentId,
+      phone: state.currentUser.phone,
+      bio: state.currentUser.bio,
+    }),
+  },
 
-  function setUnreadTotal(n: number) {
-    unreadTotal.value = n
-  }
+  actions: {
+    updateProfile(payload: Partial<CurrentUser>) {
+      this.currentUser = {
+        ...this.currentUser,
+        ...payload,
+      }
+    },
 
-  return { profile, unreadTotal, updateProfile, setUnreadTotal }
+    logout() {
+      this.isLoggedIn = false
+    },
+
+    login() {
+      this.isLoggedIn = true
+    },
+
+    setUnreadTotal(count: number) {
+      this.unreadTotal = count
+    },
+  },
 })

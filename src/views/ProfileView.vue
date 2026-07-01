@@ -3,6 +3,7 @@ import { ref, computed, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { ElCard, ElButton, ElTag, ElTabs, ElTabPane, ElDialog, ElRadioGroup, ElRadio, ElMessage, ElEmpty } from 'element-plus'
 import { useUserStore } from '../stores/user'
+import { useFavoriteStore } from '../stores/favorite'
 import { getTrades, type TradeItem } from '../api/trade'
 import { getLostFounds, type LostFoundItem } from '../api/lostFound'
 import { getGroupBuys, type GroupBuyItem } from '../api/groupBuy'
@@ -11,6 +12,7 @@ import { getErrands, type ErrandItem } from '../api/errand'
 const router = useRouter()
 const route = useRoute()
 const userStore = useUserStore()
+const favoriteStore = useFavoriteStore()
 
 const activeTab = ref('publish')
 
@@ -41,7 +43,7 @@ onMounted(async () => {
 
   tradeRes.data.forEach((item: TradeItem) => {
     all.push({
-      id: item.id,
+      id: item.id!,
       title: item.title,
       price: item.price,
       date: item.publishTime,
@@ -52,7 +54,7 @@ onMounted(async () => {
 
   lostRes.data.forEach((item: LostFoundItem) => {
     all.push({
-      id: item.id,
+      id: item.id!,
       title: item.title,
       price: 0,
       date: item.eventTime,
@@ -63,7 +65,7 @@ onMounted(async () => {
 
   groupRes.data.forEach((item: GroupBuyItem) => {
     all.push({
-      id: item.id,
+      id: item.id!,
       title: item.title,
       price: 0,
       date: item.deadline,
@@ -74,7 +76,7 @@ onMounted(async () => {
 
   errandRes.data.forEach((item: ErrandItem) => {
     all.push({
-      id: item.id,
+      id: item.id!,
       title: item.title,
       price: item.reward,
       date: item.deadline,
@@ -88,18 +90,9 @@ onMounted(async () => {
 
 const stats = computed(() => ({
   posts: myPosts.value.length,
-  favorites: 8,
+  favorites: favoriteStore.favoriteCount,
   reviews: 5,
 }))
-
-const myFavorites = ref([
-  { title: '机械键盘 青轴', price: 89, img: 'https://picsum.photos/seed/keyboard/120/120' },
-  { title: '英语六级真题', price: 20, img: 'https://picsum.photos/seed/english-book/120/120' },
-  { title: '瑜伽垫 加厚', price: 35, img: 'https://picsum.photos/seed/yoga-mat/120/120' },
-  { title: '台灯 LED 护眼', price: 45, img: 'https://picsum.photos/seed/desk-lamp/120/120' },
-  { title: '移动电源 20000mAh', price: 60, img: 'https://picsum.photos/seed/powerbank/120/120' },
-  { title: '画板 4K 美术生', price: 30, img: 'https://picsum.photos/seed/drawing-board/120/120' },
-])
 
 const statusDialogVisible = ref(false)
 const editingItem = ref<{ title: string; status: string } | null>(null)
@@ -119,9 +112,8 @@ function confirmStatus() {
   ElMessage.success('状态已更新')
 }
 
-function removeFavorite(idx: number) {
-  myFavorites.value.splice(idx, 1)
-  ElMessage.success('已取消收藏')
+function removeFavorite(type: string, id: number) {
+  favoriteStore.removeFavorite(type as 'trade' | 'lostFound' | 'groupBuy' | 'errand', id)
 }
 
 function statusTagType(status: string) {
@@ -178,14 +170,13 @@ function statusLabel(status: string) {
       </el-tab-pane>
 
       <el-tab-pane label="我的收藏" name="favorite">
-        <div v-if="myFavorites.length" class="fav-grid">
-          <div v-for="(item, i) in myFavorites" :key="i" class="fav-card">
-            <img :src="item.img" :alt="item.title" class="fav-img" />
+        <div v-if="favoriteStore.favorites.length" class="fav-grid">
+          <div v-for="item in favoriteStore.favorites" :key="`${item.type}-${item.id}`" class="fav-card">
             <div class="fav-info">
               <div class="fav-title">{{ item.title }}</div>
-              <div class="fav-price">¥{{ item.price }}</div>
+              <div class="fav-desc">{{ item.description || item.type }}</div>
             </div>
-            <button class="fav-remove" @click="removeFavorite(i)">✕</button>
+            <button class="fav-remove" @click="removeFavorite(item.type, item.id)">✕</button>
           </div>
         </div>
         <el-empty v-else description="暂无收藏" />
@@ -230,7 +221,7 @@ function statusLabel(status: string) {
 .fav-img { width: 100%; aspect-ratio: 1; object-fit: cover; }
 .fav-info { padding: 10px; }
 .fav-title { font-size: 13px; font-weight: 500; color: #333; margin-bottom: 4px; }
-.fav-price { font-size: 14px; font-weight: 700; color: #e74c3c; }
+.fav-desc { font-size: 12px; color: #999; }
 .fav-remove { position: absolute; top: 6px; right: 6px; width: 24px; height: 24px; border-radius: 50%; border: none; background: rgba(0,0,0,0.4); color: #fff; font-size: 12px; cursor: pointer; }
 .status-radio-group { display: flex; flex-direction: column; gap: 12px; padding: 8px 0; }
 </style>

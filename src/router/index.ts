@@ -90,6 +90,16 @@ const router = createRouter({
       name: 'AdminReview',
       component: () => import('../views/AdminReviewView.vue'),
     },
+    {
+      path: '/user-center',
+      name: 'UserCenter',
+      component: () => import('../views/UserCenterView.vue'),
+    },
+    {
+      path: '/:pathMatch(.*)*',
+      name: 'NotFound',
+      redirect: '/home',
+    },
   ],
 })
 

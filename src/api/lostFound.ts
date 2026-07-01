@@ -3,7 +3,7 @@ import http from './http'
 export interface LostFoundItem {
   id?: number
   title: string
-  type: string
+  type: 'lost' | 'found'
   itemName: string
   location: string
   eventTime: string

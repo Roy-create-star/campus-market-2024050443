@@ -9,8 +9,10 @@ import { getTrades, type TradeItem } from '../api/trade'
 import { getLostFounds, type LostFoundItem } from '../api/lostFound'
 import { getGroupBuys, type GroupBuyItem } from '../api/groupBuy'
 import { getErrands, type ErrandItem } from '../api/errand'
+import { useFavoriteStore } from '../stores/favorite'
 
 const router = useRouter()
+const favoriteStore = useFavoriteStore()
 
 interface CardItem {
   id: number
@@ -24,7 +26,6 @@ interface CardItem {
   time: string
   statusType: string
   statusText: string
-  liked: boolean
   location: string
   foundDate?: string
   current?: number
@@ -96,7 +97,7 @@ onMounted(async () => {
 
   tradeRes.data.forEach((item: TradeItem) => {
     result.push({
-      id: item.id,
+      id: item.id!,
       title: item.title,
       imgKey: 'trade-' + item.id,
       type: '二手',
@@ -105,14 +106,13 @@ onMounted(async () => {
       time: item.publishTime,
       statusType: item.status === 'open' ? 'success' : 'info',
       statusText: item.status === 'open' ? '在售' : '已关闭',
-      liked: false,
       location: item.location,
     })
   })
 
   lostRes.data.forEach((item: LostFoundItem) => {
     result.push({
-      id: item.id,
+      id: item.id!,
       title: item.title,
       imgKey: 'lost-' + item.id,
       type: '失物',
@@ -121,7 +121,6 @@ onMounted(async () => {
       time: item.eventTime,
       statusType: 'warning',
       statusText: item.status === 'open' ? '待认领' : '已找回',
-      liked: false,
       foundDate: item.eventTime,
       location: item.location,
     })
@@ -129,7 +128,7 @@ onMounted(async () => {
 
   groupRes.data.forEach((item: GroupBuyItem) => {
     result.push({
-      id: item.id,
+      id: item.id!,
       title: item.title,
       imgKey: 'group-' + item.id,
       type: '拼单',
@@ -138,7 +137,6 @@ onMounted(async () => {
       time: item.deadline,
       statusType: 'primary',
       statusText: item.status === 'open' ? '拼单中' : '已结束',
-      liked: false,
       current: item.currentCount,
       max: item.targetCount,
       location: item.location,
@@ -147,7 +145,7 @@ onMounted(async () => {
 
   errandRes.data.forEach((item: ErrandItem) => {
     result.push({
-      id: item.id,
+      id: item.id!,
       title: item.title,
       imgKey: 'errand-' + item.id,
       type: '跑腿',
@@ -157,7 +155,6 @@ onMounted(async () => {
       time: item.deadline,
       statusType: item.status === 'open' ? 'success' : 'info',
       statusText: item.status === 'open' ? '进行中' : '已完成',
-      liked: false,
       location: item.to,
     })
   })
@@ -257,8 +254,14 @@ const paginatedCards = computed(() => {
   return filteredCards.value.slice(start, end)
 })
 
-const toggleLike = (card: CardItem) => {
-  card.liked = !card.liked
+const toggleFavorite = (card: CardItem) => {
+  favoriteStore.toggleFavorite({
+    id: card.id,
+    type: card.dataType as 'trade' | 'lostFound' | 'groupBuy' | 'errand',
+    title: card.title,
+    description: '',
+    location: card.location,
+  })
 }
 
 const applyFilters = () => {
@@ -420,10 +423,10 @@ const getProgressPercent = (current?: number, max?: number): number => {
                       <span v-else-if="card.type === '失物'" class="card-grp-hint">{{ card.foundDate }}</span>
                       <span
                         class="heart-btn"
-                        :class="{ liked: card.liked }"
-                        @click.stop="toggleLike(card)"
+                        :class="{ favorited: favoriteStore.isFavorite(card.dataType as any, card.id) }"
+                        @click.stop="toggleFavorite(card)"
                       >
-                        {{ card.liked ? '❤️' : '🤍' }}
+                        {{ favoriteStore.isFavorite(card.dataType as any, card.id) ? '⭐' : '☆' }}
                       </span>
                     </div>
                     <div class="card-cube-footer">
@@ -449,10 +452,10 @@ const getProgressPercent = (current?: number, max?: number): number => {
                       <h4 class="list-title">{{ card.title }}</h4>
                       <span
                         class="heart-btn heart-list"
-                        :class="{ liked: card.liked }"
-                        @click.stop="toggleLike(card)"
+                        :class="{ favorited: favoriteStore.isFavorite(card.dataType as any, card.id) }"
+                        @click.stop="toggleFavorite(card)"
                       >
-                        {{ card.liked ? '❤️' : '🤍' }}
+                        {{ favoriteStore.isFavorite(card.dataType as any, card.id) ? '⭐' : '☆' }}
                       </span>
                     </div>
                     <div class="list-campus">{{ card.campus }}</div>
@@ -862,6 +865,10 @@ const getProgressPercent = (current?: number, max?: number): number => {
 
 .heart-btn:hover {
   transform: scale(1.25);
+}
+
+.heart-btn.favorited {
+  transform: scale(1.1);
 }
 
 .heart-list {
